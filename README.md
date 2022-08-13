@@ -1,3 +1,3 @@
-# theForger-winapi-tutorial
+# theForger's Win32 API tutorial
 
 An unofficial repo of theForger's Win32 API tutorial as well as an archive of the site.
