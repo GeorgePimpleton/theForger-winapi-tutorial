@@ -1,32 +1,24 @@
-# Prerequisites
-*.d
+# Unwanted folders
+Debug/
+Release/
+x64/
+.vs/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+# Compile & misc files
 *.exe
-*.out
-*.app
+*.aps
+*.obj
+*.lib
+*.log
+*.tlog
+*.VC.db
+*.cache
+*.pdb
+*.pch
+*.sln
+*.user
+*.vcxproj
+*.filter
+
+# MacOS-specific
+.DS_Store
