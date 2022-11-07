@@ -13,7 +13,7 @@ Windows and C/C++ have changed since Win9X/Me was Windows.  Programmers need to 
 
 ### Why this repository exists
 
-theForger's Win32 API tutorial is one of the best free online resources for learning the basics of Win32 API programming, but the code is IMO out-dated.  Written when Win9X was the main OS the Windows API has changed since then.  Windows© is no longer a hybrid 16/32 bit hybrid operating system.  The core of the operating system is all 32-bit or 64-bit.  64-bit CPUs are now common and Microsoft has kept up by releasing a x64 Windows© version.
+theForger's Win32 API tutorial is one of the best free online resources for learning the basics of Win32 API programming, but the code is IMO hopelessly out-dated.  Written when Win9X was the main OS the Windows API has changed since then.  Windows© is no longer a hybrid 16/32 bit hybrid operating system.  The core of the operating system is all 32-bit or 64-bit.  64-bit CPUs are now common and Microsoft has kept up by releasing x64 Windows© with a resulting change to the Windows API.
 
 Rewriting the code to work with modern Windows© systems is the goal.  The goal of having theForger's Win32 API sources compile and work on a modern system whether it is x86 or x64.
 
@@ -21,7 +21,7 @@ Rewriting the code to work with modern Windows© systems is the goal.  The goal 
 
 I changed the directory structure to better reflect the tutorial's flow.
 
-I used Visual Studio 2019/2022 Community editions to rework and modernize the code.  The changes are (not a complete list):
+I used Visual Studio 2019/2022 Community editions to rework and modernize the code as made sense to me.  The changes are (not a complete list):
 
 1. Explictly used the Unicode version of WinAPI functions, objects and data types.  wWinMain vs. WinMain, for example.  WCHAR vs. TCHAR.  And so on.
 2. Add/changed some casts so the code would work with both x86 & x64 Windows©.
