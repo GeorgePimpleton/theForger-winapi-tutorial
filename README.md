@@ -9,7 +9,7 @@ An unofficial repo of theForger's Win32 API tutorial as well as an archive of [t
 
 Win9X/Me is officially dead!  Windows API ANSI encoding is dead!  Windows XP and later now use Unicode!
 
-Windows and C/C++ have changed since Win9X/Me.  Programmers need to adapt.
+Windows and C/C++ have changed since Win9X/Me was Windows.  Programmers need to adapt.
 
 ### Why this repository exists
 
