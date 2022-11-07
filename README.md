@@ -23,11 +23,11 @@ I changed the directory structure to better reflect the tutorial's flow.
 
 I used Visual Studio 2019/2022 Community editions to rework and modernize the code.  The changes are (not a complete list):
 
-1. Explictly used the Unicode version of WinAPI functions, objects and data types.  wWinMain vs. WinMain, for example.  WCHAR vs. char.
+1. Explictly used the Unicode version of WinAPI functions, objects and data types.  wWinMain vs. WinMain, for example.  WCHAR vs. TCHAR.  And so on.
 2. Add/changed some casts so the code would work with both x86 & x64 Windows©.
 3. Used SAL on wWinMain to stop Visual Studio whinging about "inconsistent annotations".
 
-Compare theForger's orginal code and my version to see what I consider to be required modifications.
+Compare theForger's orginal code and my version to see what I consider to be necessary or required modifications.
 
 Why don't I simply repo the entire solution instead of just the individual source files?  My layout might not work for you.  I also like being able to compile and test any code for x86 & x64.
 
