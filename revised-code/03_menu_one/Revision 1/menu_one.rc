@@ -1,0 +1,26 @@
+#include "resource.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MYMENU MENU DISCARDABLE
+{
+    POPUP "&File"
+    {
+        MENUITEM "E&xit",               ID_FILE_EXIT
+    }
+    POPUP "&Stuff"
+    {
+        MENUITEM "&Go",                 ID_STUFF_GO
+        MENUITEM "Go &Somewhere Else",  ID_STUFF_GOSOMEWHEREELSE, GRAYED
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+IDI_MYICON              ICON    DISCARDABLE     "menu_one.ico"
