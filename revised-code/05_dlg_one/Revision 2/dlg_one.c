@@ -2,11 +2,11 @@
 
 #include "resource.h"
 
-const WCHAR g_szClassName[ ] = L"myWindowClass";
+PCWSTR g_className = L"myWindowClass";
 
-BOOL CALLBACK AboutDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK AboutDlgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-   switch (Message)
+   switch (msg)
    {
    case WM_INITDIALOG:
       return TRUE;
@@ -15,11 +15,11 @@ BOOL CALLBACK AboutDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
       switch (LOWORD(wParam))
       {
       case IDOK:
-         EndDialog(hwnd, IDOK);
+         EndDialog(wnd, IDOK);
          break;
 
       case IDCANCEL:
-         EndDialog(hwnd, IDCANCEL);
+         EndDialog(wnd, IDCANCEL);
          break;
       }
       break;
@@ -30,34 +30,35 @@ BOOL CALLBACK AboutDlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam
    return TRUE;
 }
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-   switch (Message)
+   switch (msg)
    {
    case WM_COMMAND:
       switch (LOWORD(wParam))
       {
       case ID_FILE_EXIT:
-         PostMessageW(hwnd, WM_CLOSE, 0, 0);
+         PostMessageW(wnd, WM_CLOSE, 0, 0);
          break;
 
       case ID_HELP_ABOUT:
       {
          int ret = (int) DialogBoxW(GetModuleHandleW(NULL),
-                              MAKEINTRESOURCEW(IDD_ABOUT), hwnd, (DLGPROC) AboutDlgProc);
+                                    MAKEINTRESOURCEW(IDD_ABOUT), wnd, (DLGPROC) AboutDlgProc);
+
          if (ret == IDOK)
          {
-            MessageBoxW(hwnd, L"Dialog exited with IDOK.", L"Notice",
+            MessageBoxW(wnd, L"Dialog exited with IDOK.", L"Notice",
                         MB_OK | MB_ICONINFORMATION);
          }
          else if (ret == IDCANCEL)
          {
-            MessageBoxW(hwnd, L"Dialog exited with IDCANCEL.", L"Notice",
+            MessageBoxW(wnd, L"Dialog exited with IDCANCEL.", L"Notice",
                         MB_OK | MB_ICONINFORMATION);
          }
          else if (ret == -1)
          {
-            MessageBoxW(hwnd, L"Dialog failed!", L"Error",
+            MessageBoxW(wnd, L"Dialog failed!", L"Error",
                         MB_OK | MB_ICONINFORMATION);
          }
       }
@@ -66,7 +67,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
       break;
 
    case WM_CLOSE:
-      DestroyWindow(hwnd);
+      DestroyWindow(wnd);
       break;
 
    case WM_DESTROY:
@@ -74,30 +75,35 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
       break;
 
    default:
-      return DefWindowProcW(hwnd, Message, wParam, lParam);
+      return DefWindowProcW(wnd, msg, wParam, lParam);
    }
    return 0;
 }
 
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-                    _In_ PWSTR lpCmdLine, _In_ int nCmdShow)
+int WINAPI wWinMain(_In_     HINSTANCE inst,
+                    _In_opt_ HINSTANCE prevInst,
+                    _In_     PWSTR     cmdLine,
+                    _In_     int       cmdShow)
 {
-   WNDCLASSEXW wc;
-   HWND        hwnd;
-   MSG         Msg;
+   UNREFERENCED_PARAMETER(prevInst);
+   UNREFERENCED_PARAMETER(cmdLine);
+
+   WNDCLASSEXW wc = { 0 };
+   HWND        wnd;
+   MSG         msg;
 
    wc.cbSize        = sizeof(WNDCLASSEXW);
    wc.style         = 0;
    wc.lpfnWndProc   = WndProc;
    wc.cbClsExtra    = 0;
    wc.cbWndExtra    = 0;
-   wc.hInstance     = hInstance;
+   wc.hInstance     = inst;
    wc.hIcon         = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
    wc.hIconSm       = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
    wc.hCursor       = (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
    wc.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
    wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MYMENU);
-   wc.lpszClassName = g_szClassName;
+   wc.lpszClassName = g_className;
 
    if (!RegisterClassExW(&wc))
    {
@@ -106,27 +112,26 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
       return 0;
    }
 
-   hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,
-                         g_szClassName,
-                         L"The title of my window",
+   wnd = CreateWindowEx(WS_EX_CLIENTEDGE,
+                         g_className, L"The title of my window",
                          WS_OVERLAPPEDWINDOW,
                          CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-                         NULL, NULL, hInstance, NULL);
+                         NULL, NULL, inst, NULL);
 
-   if (hwnd == NULL)
+   if (wnd == NULL)
    {
       MessageBoxW(NULL, L"Window Creation Failed!", L"Error!",
                   MB_ICONEXCLAMATION | MB_OK);
       return 0;
    }
 
-   ShowWindow(hwnd, nCmdShow);
-   UpdateWindow(hwnd);
+   ShowWindow(wnd, cmdShow);
+   UpdateWindow(wnd);
 
-   while (GetMessageW(&Msg, NULL, 0, 0) > 0)
+   while (GetMessageW(&msg, NULL, 0, 0) > 0)
    {
-      TranslateMessage(&Msg);
-      DispatchMessageW(&Msg);
+      TranslateMessage(&msg);
+      DispatchMessageW(&msg);
    }
-   return (int) Msg.wParam;
+   return (int) msg.wParam;
 }
