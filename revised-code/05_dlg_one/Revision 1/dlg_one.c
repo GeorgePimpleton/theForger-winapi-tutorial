@@ -41,10 +41,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
       case ID_FILE_EXIT:
          PostMessage(hwnd, WM_CLOSE, 0, 0);
          break;
+
       case ID_HELP_ABOUT:
       {
          int ret = DialogBox(GetModuleHandle(NULL),
                              MAKEINTRESOURCE(IDD_ABOUT), hwnd, AboutDlgProc);
+
          if ( ret == IDOK )
          {
             MessageBox(hwnd, TEXT("Dialog exited with IDOK."), TEXT("Notice"),
@@ -65,7 +67,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
       }
       break;
 
- case WM_CLOSE:
+   case WM_CLOSE:
       DestroyWindow(hwnd);
       break;
 
@@ -79,8 +81,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
    return 0;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                   PTSTR lpCmdLine, int nCmdShow)
+int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+                     PTSTR lpCmdLine, int nCmdShow)
 {
    WNDCLASSEX wc;
    HWND       hwnd;
@@ -127,5 +129,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       TranslateMessage(&Msg);
       DispatchMessage(&Msg);
    }
-   return (int) Msg.wParam;
+   return Msg.wParam;
 }
