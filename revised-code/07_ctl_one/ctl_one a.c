@@ -53,6 +53,10 @@ BOOL CALLBACK DlgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
                // Dont' forget to free the memory!
                GlobalFree((HANDLE) buf);
+
+               // let's update the text message of the number of added items
+               // it's kinda stupid to not update the message when adding strings
+               SetDlgItemInt(wnd, IDC_SHOWCOUNT, times, FALSE);
             }
             else
             {
