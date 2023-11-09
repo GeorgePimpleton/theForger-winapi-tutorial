@@ -1,76 +1,84 @@
 #include <windows.h>
 
-const char g_szClassName[] = "myWindowClass";
+const PCWSTR g_className = L"myWindowClass";
 
 // Step 4: the Window Procedure
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(msg)
-	{
-		case WM_CLOSE:
-			DestroyWindow(hwnd);
-		break;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-		break;
-		default:
-			return DefWindowProc(hwnd, msg, wParam, lParam);
-	}
-	return 0;
+   switch ( msg )
+   {
+   case WM_CLOSE:
+      DestroyWindow(wnd);
+      break;
+
+   case WM_DESTROY:
+      PostQuitMessage(0);
+      break;
+
+   default:
+      return DefWindowProcW(wnd, msg, wParam, lParam);
+   }
+
+   return 0;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	LPSTR lpCmdLine, int nCmdShow)
+// Step 0: Windows desktop WinAPI app entry point
+int WINAPI wWinMain(_In_     HINSTANCE inst,
+                    _In_opt_ HINSTANCE prevInst,
+                    _In_     PWSTR     cmdLine,
+                    _In_     int       cmdShow)
 {
-	WNDCLASSEX wc;
-	HWND hwnd;
-	MSG Msg;
+   UNREFERENCED_PARAMETER(prevInst);
+   UNREFERENCED_PARAMETER(cmdLine);
 
-	//Step 1: Registering the Window Class
-	wc.cbSize		 = sizeof(WNDCLASSEX);
-	wc.style		 = 0;
-	wc.lpfnWndProc	 = WndProc;
-	wc.cbClsExtra	 = 0;
-	wc.cbWndExtra	 = 0;
-	wc.hInstance	 = hInstance;
-	wc.hIcon		 = LoadIcon(NULL, IDI_APPLICATION);
-	wc.hCursor		 = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-	wc.lpszMenuName  = NULL;
-	wc.lpszClassName = g_szClassName;
-	wc.hIconSm		 = LoadIcon(NULL, IDI_APPLICATION);
+   WNDCLASSEXW wc = { 0 };
+   HWND        wnd;
+   MSG         msg;
 
-	if(!RegisterClassEx(&wc))
-	{
-		MessageBox(NULL, "Window Registration Failed!", "Error!",
-			MB_ICONEXCLAMATION | MB_OK);
-		return 0;
-	}
+   // Step 1: Registering the Window Class
+   wc.cbSize        = sizeof(WNDCLASSEXW);
+   wc.style         = 0;
+   wc.lpfnWndProc   = WndProc;
+   wc.cbClsExtra    = 0;
+   wc.cbWndExtra    = 0;
+   wc.hInstance     = inst;
+   wc.hIcon         = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hCursor       = (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
+   wc.hbrBackground = (HBRUSH)  (COLOR_WINDOW + 1);
+   wc.lpszMenuName  = NULL;
+   wc.lpszClassName = g_className;
+   wc.hIconSm       = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
 
-	// Step 2: Creating the Window
-	hwnd = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
-		g_szClassName,
-		"The title of my window",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-		NULL, NULL, hInstance, NULL);
+   if ( !RegisterClassExW(&wc) )
+   {
+      MessageBoxW(NULL, L"Window Registration Failed!", L"Error!",
+                  MB_ICONEXCLAMATION | MB_OK);
+      return 0;
+   }
 
-	if(hwnd == NULL)
-	{
-		MessageBox(NULL, "Window Creation Failed!", "Error!",
-			MB_ICONEXCLAMATION | MB_OK);
-		return 0;
-	}
+   // Step 2: Creating (and showing) the Window
+   wnd = CreateWindowEx(WS_EX_CLIENTEDGE,
+                        g_className,
+                        L"The title of my window",
+                        WS_OVERLAPPEDWINDOW,
+                        CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
+                        NULL, NULL, inst, NULL);
 
-	ShowWindow(hwnd, nCmdShow);
-	UpdateWindow(hwnd);
+   if ( wnd == NULL )
+   {
+      MessageBoxW(NULL, L"Window Creation Failed!", L"Error!",
+                  MB_ICONEXCLAMATION | MB_OK);
+      return 0;
+   }
 
-	// Step 3: The Message Loop
-	while(GetMessage(&Msg, NULL, 0, 0) > 0)
-	{
-		TranslateMessage(&Msg);
-		DispatchMessage(&Msg);
-	}
-	return Msg.wParam;
+   ShowWindow(wnd, cmdShow);
+   UpdateWindow(wnd);
+
+   // Step 3: The Message Loop
+   while ( GetMessageW(&msg, NULL, 0, 0) > 0 )
+   {
+      TranslateMessage(&msg);
+      DispatchMessageW(&msg);
+   }
+   return (int) msg.wParam;
 }
