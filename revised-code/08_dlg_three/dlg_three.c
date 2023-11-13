@@ -2,46 +2,48 @@
 
 #include "resource.h"
 
-HBRUSH g_hbrBackground = NULL;
-
-BOOL CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK DlgProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-   switch (Message)
+   static HBRUSH g_background = NULL;
+
+   switch ( msg )
    {
    case WM_INITDIALOG:
-      g_hbrBackground = CreateSolidBrush(RGB(55, 55, 55));
+      g_background = CreateSolidBrush(RGB(55, 55, 55));
 
-      SendMessageW(hwnd, WM_SETICON, ICON_SMALL, (LPARAM) LoadIconW(NULL, MAKEINTRESOURCEW(IDI_APPLICATION)));
-      SendMessageW(hwnd, WM_SETICON, ICON_BIG,   (LPARAM) LoadIconW(NULL, MAKEINTRESOURCEW(IDI_APPLICATION)));
+      SendMessageW(wnd, WM_SETICON, ICON_SMALL, (LPARAM) LoadIconW(NULL, MAKEINTRESOURCEW(IDI_APPLICATION)));
+      SendMessageW(wnd, WM_SETICON, ICON_BIG, (LPARAM) LoadIconW(NULL, MAKEINTRESOURCEW(IDI_APPLICATION)));
       break;
 
    case WM_CLOSE:
-      EndDialog(hwnd, 0);
+      EndDialog(wnd, 0);
       break;
 
    case WM_CTLCOLORDLG:
-      return (LONG) g_hbrBackground;
+      return (LONG) g_background;
 
    case WM_CTLCOLORSTATIC:
    {
-      HDC hdcStatic = (HDC) wParam;
-      SetTextColor(hdcStatic, RGB(255, 255, 255));
-      SetBkMode(hdcStatic, TRANSPARENT);
-      return (LONG) (HBRUSH) g_hbrBackground;
+      HDC dcStatic = (HDC) wParam;
+
+      SetTextColor(dcStatic, RGB(255, 255, 255));
+      SetBkMode(dcStatic, TRANSPARENT);
+
+      return (LONG) (HBRUSH) g_background;
    }
    break;
 
    case WM_COMMAND:
-      switch (LOWORD(wParam))
+      switch ( LOWORD(wParam) )
       {
       case IDOK:
-         EndDialog(hwnd, 0);
+         EndDialog(wnd, 0);
          break;
       }
       break;
 
    case WM_DESTROY:
-      DeleteObject(g_hbrBackground);
+      DeleteObject(g_background);
       break;
 
    default:
@@ -50,8 +52,12 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
    return TRUE;
 }
 
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-                    _In_ PWSTR lpCmdLine, _In_ int nCmdShow)
+int WINAPI wWinMain(_In_ HINSTANCE inst, _In_opt_ HINSTANCE prevInst,
+                    _In_ PWSTR cmdLine, _In_ int cmdShow)
 {
-   return (int) DialogBoxW(hInstance, MAKEINTRESOURCEW(IDD_MAIN), NULL, (DLGPROC) DlgProc);
+   UNREFERENCED_PARAMETER(prevInst);
+   UNREFERENCED_PARAMETER(cmdLine);
+   UNREFERENCED_PARAMETER(cmdShow);
+
+   return (int) DialogBoxParamW(inst, MAKEINTRESOURCEW(IDD_MAIN), NULL, (DLGPROC) DlgProc, 0L);
 }
