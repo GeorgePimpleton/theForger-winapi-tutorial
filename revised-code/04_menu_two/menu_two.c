@@ -1,124 +1,135 @@
 #include <windows.h>
 
 #define ID_FILE_EXIT 9001
-#define ID_STUFF_GO 9002
+#define ID_STUFF_GO  9002
 
-const char g_szClassName[] = "myWindowClass";
+PCWSTR g_className = L"myWindowClass";
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(Message)
-	{
-		case WM_CREATE:
-		{
-			HMENU hMenu, hSubMenu;
-			HICON hIcon, hIconSm;
+   switch ( msg )
+   {
+   case WM_CREATE:
+   {
+      HMENU hMenu;
+      HMENU hSubMenu;
+      HICON hIcon;
+      HICON hIconSm;
 
-			hMenu = CreateMenu();
+      hMenu = CreateMenu( );
 
-			hSubMenu = CreatePopupMenu();
-			AppendMenu(hSubMenu, MF_STRING, ID_FILE_EXIT, "E&xit");
-			AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&File");
+      hSubMenu = CreatePopupMenu( );
+      AppendMenuW(hSubMenu, MF_STRING, ID_FILE_EXIT, L"E&xit");
+      AppendMenuW(hMenu, MF_STRING | MF_POPUP, (UINT) hSubMenu, L"&File");
 
-			hSubMenu = CreatePopupMenu();
-			AppendMenu(hSubMenu, MF_STRING, ID_STUFF_GO, "&Go");
-			AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, "&Stuff");
+      hSubMenu = CreatePopupMenu( );
+      AppendMenuW(hSubMenu, MF_STRING, ID_STUFF_GO, L"&Go");
+      AppendMenuW(hMenu, MF_STRING | MF_POPUP, (UINT) hSubMenu, L"&Stuff");
 
-			SetMenu(hwnd, hMenu);
+      SetMenu(wnd, hMenu);
 
-			hIcon = (HICON)LoadImage(NULL, "menu_two.ico", IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
-			if(hIcon)
-			{
-				SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-			}
-			else
-			{
-				MessageBox(hwnd, "Could not load large icon! Is it in the current working directory?", "Error", MB_OK | MB_ICONERROR);
-			}
+      hIcon = (HICON) LoadImageW(NULL, L"menu_two.ico", IMAGE_ICON, 32, 32, LR_LOADFROMFILE);
 
-			hIconSm = (HICON)LoadImage(NULL, "menu_two.ico", IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
-			if(hIconSm)
-			{
-				SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIconSm);
-			}
-			else
-			{
-				MessageBox(hwnd, "Could not load small icon! Is it in the current working directory?", "Error", MB_OK | MB_ICONERROR);
-			}
-		}
-		break;
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-				case ID_FILE_EXIT:
-					PostMessage(hwnd, WM_CLOSE, 0, 0);
-				break;
-				case ID_STUFF_GO:
-					MessageBox(hwnd, "You clicked Go!", "Woo!", MB_OK);
-				break;
-			}
-		break;
-		case WM_CLOSE:
-			DestroyWindow(hwnd);
-		break;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-		break;
-		default:
-			return DefWindowProc(hwnd, Message, wParam, lParam);
-	}
-	return 0;
+      if ( hIcon )
+      {
+         SendMessageW(wnd, WM_SETICON, ICON_BIG, (LPARAM) hIcon);
+      }
+      else
+      {
+         MessageBoxW(wnd, L"Could not load large icon! Is it in the current working directory?", L"Error", MB_OK | MB_ICONERROR);
+      }
+
+      hIconSm = (HICON) LoadImageW(NULL, L"menu_two.ico", IMAGE_ICON, 16, 16, LR_LOADFROMFILE);
+
+      if ( hIconSm )
+      {
+         SendMessageW(wnd, WM_SETICON, ICON_SMALL, (LPARAM) hIconSm);
+      }
+      else
+      {
+         MessageBoxW(wnd, L"Could not load small icon! Is it in the current working directory?", L"Error", MB_OK | MB_ICONERROR);
+      }
+   }
+   break;
+
+   case WM_COMMAND:
+      switch ( LOWORD(wParam) )
+      {
+      case ID_FILE_EXIT:
+         PostMessageW(wnd, WM_CLOSE, 0, 0);
+         break;
+
+      case ID_STUFF_GO:
+         MessageBoxW(wnd, L"You clicked Go!", L"Woo!", MB_OK);
+         break;
+      }
+      break;
+
+   case WM_CLOSE:
+      DestroyWindow(wnd);
+      break;
+
+   case WM_DESTROY:
+      PostQuitMessage(0);
+      break;
+
+   default:
+      return DefWindowProcW(wnd, msg, wParam, lParam);
+   }
+   return 0;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	LPSTR lpCmdLine, int nCmdShow)
+int WINAPI wWinMain(_In_ HINSTANCE inst, _In_opt_ HINSTANCE prevInst,
+                    _In_ PWSTR cmdLine, _In_ int cmdShow)
 {
-	WNDCLASSEX wc;
-	HWND hwnd;
-	MSG Msg;
+   UNREFERENCED_PARAMETER(prevInst);
+   UNREFERENCED_PARAMETER(cmdLine);
 
-	wc.cbSize		 = sizeof(WNDCLASSEX);
-	wc.style		 = 0;
-	wc.lpfnWndProc	 = WndProc;
-	wc.cbClsExtra	 = 0;
-	wc.cbWndExtra	 = 0;
-	wc.hInstance	 = hInstance;
-	wc.hIcon		 = NULL;
-	wc.hCursor		 = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
-	wc.lpszMenuName  = NULL;
-	wc.lpszClassName = g_szClassName;
-	wc.hIconSm		 = NULL;
+   WNDCLASSEXW wc = { 0 };
+   HWND        wnd;
+   MSG         msg;
 
-	if(!RegisterClassEx(&wc))
-	{
-		MessageBox(NULL, "Window Registration Failed!", "Error!",
-			MB_ICONEXCLAMATION | MB_OK);
-		return 0;
-	}
+   wc.cbSize        = sizeof(WNDCLASSEXW);
+   wc.style         = 0;
+   wc.lpfnWndProc   = WndProc;
+   wc.cbClsExtra    = 0;
+   wc.cbWndExtra    = 0;
+   wc.hInstance     = inst;
+   wc.hIcon         = NULL;
+   wc.hCursor       = (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
+   wc.hbrBackground = (HBRUSH)  (COLOR_WINDOW + 1);
+   wc.lpszMenuName  = NULL;
+   wc.lpszClassName = g_className;
+   wc.hIconSm       = NULL;
 
-	hwnd = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
-		g_szClassName,
-		"A Menu #2",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-		NULL, NULL, hInstance, NULL);
+   if ( !RegisterClassExW(&wc) )
+   {
+      MessageBoxW(NULL, L"Window Registration Failed!", L"Error!",
+                  MB_ICONEXCLAMATION | MB_OK);
+      return 0;
+   }
 
-	if(hwnd == NULL)
-	{
-		MessageBox(NULL, "Window Creation Failed!", "Error!",
-			MB_ICONEXCLAMATION | MB_OK);
-		return 0;
-	}
+   wnd = CreateWindowExW(WS_EX_CLIENTEDGE,
+                         g_className,
+                         L"A Menu #2",
+                         WS_OVERLAPPEDWINDOW,
+                         CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
+                         NULL, NULL, inst, NULL);
 
-	ShowWindow(hwnd, nCmdShow);
-	UpdateWindow(hwnd);
+   if ( wnd == NULL )
+   {
+      MessageBoxW(NULL, L"Window Creation Failed!", L"Error!",
+                  MB_ICONEXCLAMATION | MB_OK);
+      return 0;
+   }
 
-	while(GetMessage(&Msg, NULL, 0, 0) > 0)
-	{
-		TranslateMessage(&Msg);
-		DispatchMessage(&Msg);
-	}
-	return Msg.wParam;
+   ShowWindow(wnd, cmdShow);
+   UpdateWindow(wnd);
+
+   while ( GetMessageW(&msg, NULL, 0, 0) > 0 )
+   {
+      TranslateMessage(&msg);
+      DispatchMessageW(&msg);
+   }
+   return (int) msg.wParam;
 }
