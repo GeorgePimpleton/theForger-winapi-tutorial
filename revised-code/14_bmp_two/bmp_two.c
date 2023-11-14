@@ -1,51 +1,55 @@
 #include <windows.h>
 #include "resource.h"
 
-const WCHAR g_szClassName[] = L"myWindowClass";
-
-HBITMAP g_hbmBall = NULL;
-HBITMAP g_hbmMask = NULL;
-
-HBITMAP CreateBitmapMask(HBITMAP hbmColour, COLORREF crTransparent)
+HBITMAP CreateBitmapMask(HBITMAP bmColour, COLORREF transparent)
 {
-   HDC     hdcMem;
-   HDC     hdcMem2;
-   HBITMAP hbmMask;
+   HDC     dcMem;
+   HDC     dcMem2;
+   HBITMAP bmMask;
    BITMAP  bm;
 
-   GetObjectW(hbmColour, sizeof(BITMAP), &bm);
-   hbmMask = CreateBitmap(bm.bmWidth, bm.bmHeight, 1, 1, NULL);
+   GetObjectW(bmColour, sizeof(BITMAP), &bm);
+   bmMask = CreateBitmap(bm.bmWidth, bm.bmHeight, 1, 1, NULL);
 
-   hdcMem  = CreateCompatibleDC(0);
-   hdcMem2 = CreateCompatibleDC(0);
+   dcMem  = CreateCompatibleDC(0);
+   dcMem2 = CreateCompatibleDC(0);
 
-   SelectObject(hdcMem, hbmColour);
-   SelectObject(hdcMem2, hbmMask);
+   SelectObject(dcMem, bmColour);
+   SelectObject(dcMem2, bmMask);
 
-   SetBkColor(hdcMem, crTransparent);
+   SetBkColor(dcMem, transparent);
 
-   BitBlt(hdcMem2, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
+   BitBlt(dcMem2, 0, 0, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCCOPY);
 
-   BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem2, 0, 0, SRCINVERT);
+   BitBlt(dcMem, 0, 0, bm.bmWidth, bm.bmHeight, dcMem2, 0, 0, SRCINVERT);
 
-   DeleteDC(hdcMem);
-   DeleteDC(hdcMem2);
+   DeleteDC(dcMem);
+   DeleteDC(dcMem2);
 
-   return hbmMask;
+   return bmMask;
 }
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+   static HBITMAP bmBall = NULL;
+   static HBITMAP bmMask = NULL;
+
    switch ( msg )
    {
    case WM_CREATE:
-      g_hbmBall = (HBITMAP) LoadImageW(GetModuleHandleW(NULL), MAKEINTRESOURCEW(IDB_BALL), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
-      if ( g_hbmBall == NULL )
-         MessageBoxW(hwnd, L"Could not load IDB_BALL!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      bmBall = (HBITMAP) LoadImageW(GetModuleHandleW(NULL), MAKEINTRESOURCEW(IDB_BALL), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
 
-      g_hbmMask = CreateBitmapMask(g_hbmBall, RGB(0, 0, 0));
-      if ( g_hbmMask == NULL )
+      if ( bmBall == NULL )
+      {
+         MessageBoxW(hwnd, L"Could not load IDB_BALL!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      }
+
+      bmMask = CreateBitmapMask(bmBall, RGB(0, 0, 0));
+
+      if ( bmMask == NULL )
+      {
          MessageBoxW(hwnd, L"Could not create mask!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      }
       break;
 
    case WM_CLOSE:
@@ -55,38 +59,38 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
    case WM_PAINT:
    {
       BITMAP      bm;
-      RECT        rcClient;
+      RECT        client;
       PAINTSTRUCT ps;
 
-      HDC hdc = BeginPaint(hwnd, &ps);
+      HDC dc = BeginPaint(hwnd, &ps);
 
-      HDC hdcMem = CreateCompatibleDC(hdc);
-      HBITMAP hbmOld = (HBITMAP) SelectObject(hdcMem, g_hbmMask);
+      HDC     dcMem = CreateCompatibleDC(dc);
+      HBITMAP bmOld = (HBITMAP) SelectObject(dcMem, bmMask);
 
-      GetObjectW(g_hbmBall, sizeof(bm), &bm);
+      GetObjectW(bmBall, sizeof(bm), &bm);
 
-      GetClientRect(hwnd, &rcClient);
-      FillRect(hdc, &rcClient, (HBRUSH) GetStockObject(LTGRAY_BRUSH));
+      GetClientRect(hwnd, &client);
+      FillRect(dc, &client, (HBRUSH) GetStockObject(LTGRAY_BRUSH));
 
-      BitBlt(hdc, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
-      BitBlt(hdc, bm.bmWidth, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCAND);
-      BitBlt(hdc, bm.bmWidth * 2, bm.bmHeight * 2, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCAND);
+      BitBlt(dc, 0, 0, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCCOPY);
+      BitBlt(dc, bm.bmWidth, 0, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCAND);
+      BitBlt(dc, bm.bmWidth * 2, bm.bmHeight * 2, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCAND);
 
-      SelectObject(hdcMem, g_hbmBall);
-      BitBlt(hdc, 0, bm.bmHeight, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
-      BitBlt(hdc, bm.bmWidth, bm.bmHeight, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCPAINT);
-      BitBlt(hdc, bm.bmWidth * 2, bm.bmHeight * 2, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCPAINT);
+      SelectObject(dcMem, bmBall);
+      BitBlt(dc, 0, bm.bmHeight, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCCOPY);
+      BitBlt(dc, bm.bmWidth, bm.bmHeight, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCPAINT);
+      BitBlt(dc, bm.bmWidth * 2, bm.bmHeight * 2, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCPAINT);
 
-      SelectObject(hdcMem, hbmOld);
-      DeleteDC(hdcMem);
+      SelectObject(dcMem, bmOld);
+      DeleteDC(dcMem);
 
       EndPaint(hwnd, &ps);
    }
    break;
 
    case WM_DESTROY:
-      DeleteObject(g_hbmBall);
-      DeleteObject(g_hbmMask);
+      DeleteObject(bmBall);
+      DeleteObject(bmMask);
 
       PostQuitMessage(0);
       break;
@@ -97,25 +101,29 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
    return 0;
 }
 
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-                    _In_ PWSTR lpCmdLine, _In_ int nCmdShow)
+int WINAPI wWinMain(_In_ HINSTANCE inst, _In_opt_ HINSTANCE prevInst,
+                    _In_ PWSTR cmdLine, _In_ int cmdShow)
 {
-   WNDCLASSEXW wc;
-   HWND        hwnd;
-   MSG         Msg;
+   UNREFERENCED_PARAMETER(prevInst);
+   UNREFERENCED_PARAMETER(cmdLine);
+
+   WNDCLASSEXW wc        = { 0 };
+   HWND        wnd;
+   MSG         msg;
+   PCWSTR      className = L"myWindowClass";
 
    wc.cbSize        = sizeof(WNDCLASSEXW);
    wc.style         = 0;
    wc.lpfnWndProc   = WndProc;
    wc.cbClsExtra    = 0;
    wc.cbWndExtra    = 0;
-   wc.hInstance     = hInstance;
-   wc.hIcon         = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-   wc.hIconSm       = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hInstance     = inst;
+   wc.hIcon         = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hIconSm       = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
    wc.hCursor       = (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
-   wc.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+   wc.hbrBackground = (HBRUSH)  (COLOR_WINDOW + 1);
    wc.lpszMenuName  = NULL;
-   wc.lpszClassName = g_szClassName;
+   wc.lpszClassName = className;
 
    if ( !RegisterClassExW(&wc) )
    {
@@ -123,26 +131,26 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
       return 0;
    }
 
-   hwnd = CreateWindowExW(WS_EX_CLIENTEDGE,
-                          g_szClassName,
-                          L"Another Bitmap Program",
-                          WS_OVERLAPPEDWINDOW,
-                          CW_USEDEFAULT, CW_USEDEFAULT, 240, 160,
-                          NULL, NULL, hInstance, NULL);
+   wnd = CreateWindowExW(WS_EX_CLIENTEDGE,
+                         className,
+                         L"Another Bitmap Program",
+                         WS_OVERLAPPEDWINDOW,
+                         CW_USEDEFAULT, CW_USEDEFAULT, 240, 160,
+                         NULL, NULL, inst, NULL);
 
-   if ( hwnd == NULL )
+   if ( wnd == NULL )
    {
       MessageBoxW(NULL, L"Window Creation Failed!", L"Error!", MB_ICONEXCLAMATION | MB_OK);
       return 0;
    }
 
-   ShowWindow(hwnd, nCmdShow);
-   UpdateWindow(hwnd);
+   ShowWindow(wnd, cmdShow);
+   UpdateWindow(wnd);
 
-   while ( GetMessageW(&Msg, NULL, 0, 0) > 0 )
+   while ( GetMessageW(&msg, NULL, 0, 0) > 0 )
    {
-      TranslateMessage(&Msg);
-      DispatchMessageW(&Msg);
+      TranslateMessage(&msg);
+      DispatchMessageW(&msg);
    }
-   return (int) Msg.wParam;
+   return (int) msg.wParam;
 }
