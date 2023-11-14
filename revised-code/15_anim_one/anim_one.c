@@ -1,9 +1,7 @@
 #include <windows.h>
 #include "resource.h"
 
-const WCHAR g_szClassName[] = L"myWindowClass";
 const int   ID_TIMER        = 1;
-
 const int   BALL_MOVE_DELTA = 2;
 
 typedef struct _BALLINFO
@@ -12,196 +10,207 @@ typedef struct _BALLINFO
    int height;
    int x;
    int y;
-
    int dx;
    int dy;
 } BALLINFO;
 
-BALLINFO g_ballInfo;
-HBITMAP  g_hbmBall = NULL;
-HBITMAP  g_hbmMask = NULL;
+BALLINFO ballInfo;
+HBITMAP  bmBall = NULL;
+HBITMAP  bmMask = NULL;
 
-HBITMAP CreateBitmapMask(HBITMAP hbmColour, COLORREF crTransparent)
+HBITMAP CreateBitmapMask(HBITMAP bmColor, COLORREF transparent)
 {
-   HDC     hdcMem;
-   HDC     hdcMem2;
-   HBITMAP hbmMask;
+   HDC     dcMem;
+   HDC     dcMem2;
+   HBITMAP bmMask;
    BITMAP  bm;
 
-   GetObjectW(hbmColour, sizeof(BITMAP), &bm);
-   hbmMask = CreateBitmap(bm.bmWidth, bm.bmHeight, 1, 1, NULL);
+   GetObjectW(bmColor, sizeof(BITMAP), &bm);
+   bmMask = CreateBitmap(bm.bmWidth, bm.bmHeight, 1, 1, NULL);
 
-   hdcMem  = CreateCompatibleDC(0);
-   hdcMem2 = CreateCompatibleDC(0);
+   dcMem  = CreateCompatibleDC(0);
+   dcMem2 = CreateCompatibleDC(0);
 
-   SelectObject(hdcMem, hbmColour);
-   SelectObject(hdcMem2, hbmMask);
+   SelectObject(dcMem, bmColor);
+   SelectObject(dcMem2, bmMask);
 
-   SetBkColor(hdcMem, crTransparent);
+   SetBkColor(dcMem, transparent);
 
-   BitBlt(hdcMem2, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
+   BitBlt(dcMem2, 0, 0, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCCOPY);
 
-   BitBlt(hdcMem, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem2, 0, 0, SRCINVERT);
+   BitBlt(dcMem, 0, 0, bm.bmWidth, bm.bmHeight, dcMem2, 0, 0, SRCINVERT);
 
-   DeleteDC(hdcMem);
-   DeleteDC(hdcMem2);
+   DeleteDC(dcMem);
+   DeleteDC(dcMem2);
 
-   return hbmMask;
+   return bmMask;
 }
 
-void DrawBall(HDC hdc, RECT* prc)
+void DrawBall(HDC dc, RECT* rect)
 {
-   HDC hdcBuffer        = CreateCompatibleDC(hdc);
-   HBITMAP hbmBuffer    = CreateCompatibleBitmap(hdc, prc->right, prc->bottom);
-   HBITMAP hbmOldBuffer = (HBITMAP) SelectObject(hdcBuffer, hbmBuffer);
+   HDC     dcBuffer    = CreateCompatibleDC(dc);
+   HBITMAP bmBuffer    = CreateCompatibleBitmap(dc, rect-> right, rect-> bottom);
+   HBITMAP bmOldBuffer = (HBITMAP) SelectObject(dcBuffer, bmBuffer);
+   HDC     dcMem       = CreateCompatibleDC(dc);
+   HBITMAP bmOld       = (HBITMAP) SelectObject(dcMem, bmMask);
 
-   HDC hdcMem     = CreateCompatibleDC(hdc);
-   HBITMAP hbmOld = (HBITMAP) SelectObject(hdcMem, g_hbmMask);
+   FillRect(dcBuffer, rect, (HBRUSH) GetStockObject(WHITE_BRUSH));
 
-   FillRect(hdcBuffer, prc, (HBRUSH) GetStockObject(WHITE_BRUSH));
+   BitBlt(dcBuffer, ballInfo.x, ballInfo.y, ballInfo.width, ballInfo.height, dcMem, 0, 0, SRCAND);
 
-   BitBlt(hdcBuffer, g_ballInfo.x, g_ballInfo.y, g_ballInfo.width, g_ballInfo.height, hdcMem, 0, 0, SRCAND);
+   SelectObject(dcMem, bmBall);
+   BitBlt(dcBuffer, ballInfo.x, ballInfo.y, ballInfo.width, ballInfo.height, dcMem, 0, 0, SRCPAINT);
 
-   SelectObject(hdcMem, g_hbmBall);
-   BitBlt(hdcBuffer, g_ballInfo.x, g_ballInfo.y, g_ballInfo.width, g_ballInfo.height, hdcMem, 0, 0, SRCPAINT);
+   BitBlt(dc, 0, 0, rect->right, rect->bottom, dcBuffer, 0, 0, SRCCOPY);
 
-   BitBlt(hdc, 0, 0, prc->right, prc->bottom, hdcBuffer, 0, 0, SRCCOPY);
+   SelectObject(dcMem, bmOld);
+   DeleteDC(dcMem);
 
-   SelectObject(hdcMem, hbmOld);
-   DeleteDC(hdcMem);
-
-   SelectObject(hdcBuffer, hbmOldBuffer);
-   DeleteDC(hdcBuffer);
-   DeleteObject(hbmBuffer);
+   SelectObject(dcBuffer, bmOldBuffer);
+   DeleteDC(dcBuffer);
+   DeleteObject(bmBuffer);
 }
 
-void UpdateBall(RECT* prc)
+void UpdateBall(RECT* rect)
 {
-   g_ballInfo.x += g_ballInfo.dx;
-   g_ballInfo.y += g_ballInfo.dy;
+   ballInfo.x += ballInfo.dx;
+   ballInfo.y += ballInfo.dy;
 
-   if ( g_ballInfo.x < 0 )
+   if ( ballInfo.x < 0 )
    {
-      g_ballInfo.x  = 0;
-      g_ballInfo.dx = BALL_MOVE_DELTA;
+      ballInfo.x  = 0;
+      ballInfo.dx = BALL_MOVE_DELTA;
    }
-   else if ( g_ballInfo.x + g_ballInfo.width > prc->right )
+   else if ( ballInfo.x + ballInfo.width > rect->right )
    {
-      g_ballInfo.x  = prc->right - g_ballInfo.width;
-      g_ballInfo.dx = -BALL_MOVE_DELTA;
+      ballInfo.x  = rect->right - ballInfo.width;
+      ballInfo.dx = -BALL_MOVE_DELTA;
    }
 
-   if ( g_ballInfo.y < 0 )
+   if ( ballInfo.y < 0 )
    {
-      g_ballInfo.y  = 0;
-      g_ballInfo.dy = BALL_MOVE_DELTA;
+      ballInfo.y  = 0;
+      ballInfo.dy = BALL_MOVE_DELTA;
    }
-   else if ( g_ballInfo.y + g_ballInfo.height > prc->bottom )
+   else if ( ballInfo.y + ballInfo.height > rect->bottom )
    {
-      g_ballInfo.y  = prc->bottom - g_ballInfo.height;
-      g_ballInfo.dy = -BALL_MOVE_DELTA;
+      ballInfo.y  = rect->bottom - ballInfo.height;
+      ballInfo.dy = -BALL_MOVE_DELTA;
    }
 }
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
    switch ( msg )
    {
    case WM_CREATE:
    {
-      UINT ret;
+      UINT   ret;
       BITMAP bm;
 
-      g_hbmBall = (HBITMAP) LoadImageW(GetModuleHandleW(NULL), MAKEINTRESOURCEW(IDB_BALL),
-                                       IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
-      if ( g_hbmBall == NULL )
-         MessageBoxW(hwnd, L"Could not load IDB_BALL!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      bmBall = (HBITMAP) LoadImageW(GetModuleHandleW(NULL), MAKEINTRESOURCEW(IDB_BALL),
+                                    IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
 
-      g_hbmMask = CreateBitmapMask(g_hbmBall, RGB(0, 0, 0));
-      if ( g_hbmMask == NULL )
-         MessageBoxW(hwnd, L"Could not create mask!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      if ( bmBall == NULL )
+      {
+         MessageBoxW(wnd, L"Could not load IDB_BALL!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      }
+
+      bmMask = CreateBitmapMask(bmBall, RGB(0, 0, 0));
+
+      if ( bmMask == NULL )
+      {
+         MessageBoxW(wnd, L"Could not create mask!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      }
 
       #pragma warning (disable : 6387)
-      GetObjectW(g_hbmBall, sizeof(bm), &bm);
+      GetObjectW(bmBall, sizeof(bm), &bm);
 
-      ZeroMemory(&g_ballInfo, sizeof(g_ballInfo));
-      g_ballInfo.width = bm.bmWidth;
-      g_ballInfo.height = bm.bmHeight;
+      ZeroMemory(&ballInfo, sizeof(ballInfo));
+      ballInfo.width  = bm.bmWidth;
+      ballInfo.height = bm.bmHeight;
 
-      g_ballInfo.dx = BALL_MOVE_DELTA;
-      g_ballInfo.dy = BALL_MOVE_DELTA;
+      ballInfo.dx = BALL_MOVE_DELTA;
+      ballInfo.dy = BALL_MOVE_DELTA;
 
-      ret = (UINT) SetTimer(hwnd, ID_TIMER, 50, NULL);
+      ret = (UINT) SetTimer(wnd, ID_TIMER, 15, NULL);
+
       if ( ret == 0 )
-         MessageBoxW(hwnd, L"Could not SetTimer()!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      {
+         MessageBoxW(wnd, L"Could not SetTimer()!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      }
    }
    break;
 
    case WM_CLOSE:
-      DestroyWindow(hwnd);
+      DestroyWindow(wnd);
       break;
 
    case WM_PAINT:
    {
-      RECT        rcClient;
+      RECT        client;
       PAINTSTRUCT ps;
-      HDC         hdc = BeginPaint(hwnd, &ps);
+      HDC         dc = BeginPaint(wnd, &ps);
 
-      GetClientRect(hwnd, &rcClient);
-      DrawBall(hdc, &rcClient);
+      GetClientRect(wnd, &client);
+      DrawBall(dc, &client);
 
-      EndPaint(hwnd, &ps);
+      EndPaint(wnd, &ps);
    }
    break;
 
    case WM_TIMER:
    {
-      RECT rcClient;
-      HDC  hdc = GetDC(hwnd);
+      RECT client;
+      HDC  dc = GetDC(wnd);
 
-      GetClientRect(hwnd, &rcClient);
+      GetClientRect(wnd, &client);
 
-      UpdateBall(&rcClient);
-      DrawBall(hdc, &rcClient);
+      UpdateBall(&client);
+      DrawBall(dc, &client);
 
-      ReleaseDC(hwnd, hdc);
+      ReleaseDC(wnd, dc);
    }
    break;
 
    case WM_DESTROY:
-      KillTimer(hwnd, ID_TIMER);
+      KillTimer(wnd, ID_TIMER);
 
-      DeleteObject(g_hbmBall);
-      DeleteObject(g_hbmMask);
+      DeleteObject(bmBall);
+      DeleteObject(bmMask);
 
       PostQuitMessage(0);
       break;
 
    default:
-      return DefWindowProcW(hwnd, msg, wParam, lParam);
+      return DefWindowProcW(wnd, msg, wParam, lParam);
    }
    return 0;
 }
 
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-                    _In_ PWSTR lpCmdLine, _In_ int nCmdShow)
+int WINAPI wWinMain(_In_ HINSTANCE inst, _In_opt_ HINSTANCE prevInst,
+                    _In_ PWSTR cmdLine, _In_ int cmdShow)
 {
-   WNDCLASSEXW wc;
-   HWND        hwnd;
-   MSG         Msg;
+   UNREFERENCED_PARAMETER(prevInst);
+   UNREFERENCED_PARAMETER(cmdLine);
+
+   WNDCLASSEXW wc        = { 0 };
+   HWND        wnd;
+   MSG         msg;
+   PCWSTR      className = L"myWindowClass";
 
    wc.cbSize        = sizeof(WNDCLASSEXW);
    wc.style         = 0;
    wc.lpfnWndProc   = WndProc;
    wc.cbClsExtra    = 0;
    wc.cbWndExtra    = 0;
-   wc.hInstance     = hInstance;
-   wc.hIcon         = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-   wc.hIconSm       = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hInstance     = inst;
+   wc.hIcon         = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hIconSm       = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
    wc.hCursor       = (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
-   wc.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+   wc.hbrBackground = (HBRUSH)  (COLOR_WINDOW + 1);
    wc.lpszMenuName  = NULL;
-   wc.lpszClassName = g_szClassName;
+   wc.lpszClassName = className;
 
    if ( !RegisterClassExW(&wc) )
    {
@@ -209,26 +218,26 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
       return 0;
    }
 
-   hwnd = CreateWindowExW(WS_EX_CLIENTEDGE,
-                          g_szClassName,
-                          L"An Animation Program",
-                          WS_OVERLAPPEDWINDOW,
-                          CW_USEDEFAULT, CW_USEDEFAULT, 320, 240,
-                          NULL, NULL, hInstance, NULL);
+   wnd = CreateWindowExW(WS_EX_CLIENTEDGE,
+                         className,
+                         L"An Animation Program",
+                         WS_OVERLAPPEDWINDOW,
+                         CW_USEDEFAULT, CW_USEDEFAULT, 320, 240,
+                         NULL, NULL, inst, NULL);
 
-   if ( hwnd == NULL )
+   if ( wnd == NULL )
    {
       MessageBoxW(NULL, L"Window Creation Failed!", L"Error!", MB_ICONEXCLAMATION | MB_OK);
       return 0;
    }
 
-   ShowWindow(hwnd, nCmdShow);
-   UpdateWindow(hwnd);
+   ShowWindow(wnd, cmdShow);
+   UpdateWindow(wnd);
 
-   while ( GetMessageW(&Msg, NULL, 0, 0) > 0 )
+   while ( GetMessageW(&msg, NULL, 0, 0) > 0 )
    {
-      TranslateMessage(&Msg);
-      DispatchMessageW(&Msg);
+      TranslateMessage(&msg);
+      DispatchMessageW(&msg);
    }
-   return (int) Msg.wParam;
+   return (int) msg.wParam;
 }
