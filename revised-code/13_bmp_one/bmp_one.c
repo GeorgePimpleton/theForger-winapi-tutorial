@@ -1,18 +1,19 @@
 #include <windows.h>
 #include "resource.h"
 
-const WCHAR g_szClassName[] = L"myWindowClass";
-
-HBITMAP g_hbmBall = NULL;
-
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+   static HBITMAP ball = NULL;
+
    switch ( msg )
    {
    case WM_CREATE:
-      g_hbmBall = (HBITMAP) LoadImageW(GetModuleHandleW(NULL), MAKEINTRESOURCEW(IDB_BALL), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
-      if ( g_hbmBall == NULL )
+      ball = (HBITMAP) LoadImageW(GetModuleHandleW(NULL), MAKEINTRESOURCEW(IDB_BALL), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR);
+
+      if ( ball == NULL )
+      {
          MessageBoxW(hwnd, L"Could not load IDB_BALL!", L"Error", MB_OK | MB_ICONEXCLAMATION);
+      }
       break;
 
    case WM_CLOSE:
@@ -28,24 +29,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       BITMAP      bm;
       PAINTSTRUCT ps;
 
-      HDC hdc = BeginPaint(hwnd, &ps);
+      HDC dc = BeginPaint(hwnd, &ps);
 
-      HDC hdcMem     = CreateCompatibleDC(hdc);
-      HBITMAP hbmOld = (HBITMAP) SelectObject(hdcMem, g_hbmBall);
+      HDC     dcMem = CreateCompatibleDC(dc);
+      HBITMAP bmOld = (HBITMAP) SelectObject(dcMem, ball);
 
-      GetObjectW(g_hbmBall, sizeof(bm), &bm);
+      GetObjectW(ball, sizeof(bm), &bm);
 
-      BitBlt(hdc, 0, 0, bm.bmWidth, bm.bmHeight, hdcMem, 0, 0, SRCCOPY);
+      BitBlt(dc, 0, 0, bm.bmWidth, bm.bmHeight, dcMem, 0, 0, SRCCOPY);
 
-      SelectObject(hdcMem, hbmOld);
-      DeleteDC(hdcMem);
+      SelectObject(dcMem, bmOld);
+      DeleteDC(dcMem);
 
       EndPaint(hwnd, &ps);
    }
    break;
 
    case WM_DESTROY:
-      DeleteObject(g_hbmBall);
+      DeleteObject(ball);
       PostQuitMessage(0);
       break;
 
@@ -55,25 +56,29 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
    return 0;
 }
 
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-                    _In_ PWSTR lpCmdLine, _In_ int nCmdShow)
+int WINAPI wWinMain(_In_ HINSTANCE inst, _In_opt_ HINSTANCE prevInst,
+                    _In_ PWSTR cmdLine, _In_ int cmdShow)
 {
-   WNDCLASSEXW wc;
-   HWND        hwnd;
-   MSG         Msg;
+   UNREFERENCED_PARAMETER(prevInst);
+   UNREFERENCED_PARAMETER(cmdLine);
+
+   WNDCLASSEXW wc        = { 0 };
+   HWND        wnd;
+   MSG         msg;
+   PCWSTR      className = L"myWindowClass";
 
    wc.cbSize        = sizeof(WNDCLASSEXW);
    wc.style         = 0;
    wc.lpfnWndProc   = WndProc;
    wc.cbClsExtra    = 0;
    wc.cbWndExtra    = 0;
-   wc.hInstance     = hInstance;
-   wc.hIcon         = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-   wc.hIconSm       = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hInstance     = inst;
+   wc.hIcon         = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hIconSm       = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
    wc.hCursor       = (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
-   wc.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+   wc.hbrBackground = (HBRUSH)  (COLOR_WINDOW + 1);
    wc.lpszMenuName  = NULL;
-   wc.lpszClassName = g_szClassName;
+   wc.lpszClassName = className;
 
    if ( !RegisterClassExW(&wc) )
    {
@@ -81,27 +86,26 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
       return 0;
    }
 
-   hwnd = CreateWindowExW(WS_EX_CLIENTEDGE,
-                          g_szClassName,
-                          L"A Bitmap Program",
-                          WS_OVERLAPPEDWINDOW,
-                          CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-                          NULL, NULL, hInstance, NULL);
+   wnd = CreateWindowExW(WS_EX_CLIENTEDGE,
+                         className,
+                         L"A Bitmap Program",
+                         WS_OVERLAPPEDWINDOW,
+                         CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
+                         NULL, NULL, inst, NULL);
 
-   if ( hwnd == NULL )
+   if ( wnd == NULL )
    {
-      MessageBoxW(NULL, L"Window Creation Failed!", L"Error!",
-                  MB_ICONEXCLAMATION | MB_OK);
+      MessageBoxW(NULL, L"Window Creation Failed!", L"Error!", MB_ICONEXCLAMATION | MB_OK);
       return 0;
    }
 
-   ShowWindow(hwnd, nCmdShow);
-   UpdateWindow(hwnd);
+   ShowWindow(wnd, cmdShow);
+   UpdateWindow(wnd);
 
-   while ( GetMessageW(&Msg, NULL, 0, 0) > 0 )
+   while ( GetMessageW(&msg, NULL, 0, 0) > 0 )
    {
-      TranslateMessage(&Msg);
-      DispatchMessageW(&Msg);
+      TranslateMessage(&msg);
+      DispatchMessageW(&msg);
    }
-   return (int) Msg.wParam;
+   return (int) msg.wParam;
 }
