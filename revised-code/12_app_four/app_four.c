@@ -4,8 +4,8 @@
 
 #pragma comment (lib, "comctl32.lib")
 
-const WCHAR g_szClassName[]      = L"myWindowClass";
-const WCHAR g_szChildClassName[] = L"myMDIChildWindowClass";
+PCWSTR g_className      = L"myWindowClass";
+PCWSTR g_childClassName = L"myMDIChildWindowClass";
 
 #define IDC_MAIN_MDI    101
 #define IDC_MAIN_TOOL   102
@@ -15,273 +15,290 @@ const WCHAR g_szChildClassName[] = L"myMDIChildWindowClass";
 
 #define ID_MDI_FIRSTCHILD 50000
 
-HWND g_hMDIClient  = NULL;
-HWND g_hMainWindow = NULL;
+HWND g_MDIClient  = NULL;
+HWND g_mainWindow = NULL;
 
-BOOL LoadTextFileToEdit(HWND hEdit, PCWSTR pszFileName)
+BOOL LoadTextFileToEdit(HWND edit, PCWSTR fileName)
 {
-   HANDLE hFile;
-   BOOL  bSuccess = FALSE;
+   HANDLE file;
+   BOOL   success = FALSE;
 
-   hFile = CreateFileW(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL,
-                       OPEN_EXISTING, 0, NULL);
-   if ( hFile != INVALID_HANDLE_VALUE )
+   file = CreateFileW(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+
+   if ( file != INVALID_HANDLE_VALUE )
    {
-      DWORD dwFileSize;
+      DWORD fileSize;
 
-      dwFileSize = GetFileSize(hFile, NULL);
-      if ( dwFileSize != 0xFFFFFFFF )
+      fileSize = GetFileSize(file, NULL);
+
+      if ( fileSize != 0xFFFFFFFF )
       {
-         PSTR pszFileText;
+         PSTR fileText;
 
-         pszFileText = (PSTR) GlobalAlloc(GPTR, dwFileSize + 1);
-         if ( pszFileText != NULL )
+         fileText = (PSTR) GlobalAlloc(GPTR, fileSize + 1);
+
+         if ( fileText != NULL )
          {
-            DWORD dwRead;
+            DWORD read;
 
-            if ( ReadFile(hFile, pszFileText, dwFileSize, &dwRead, NULL) )
+            if ( ReadFile(file, fileText, fileSize, &read, NULL) )
             {
-               pszFileText[ dwFileSize ] = 0; // Add null terminator
-               if ( SetWindowTextA(hEdit, pszFileText) )
-                  bSuccess = TRUE; // It worked!
+               fileText[fileSize] = 0; // Add null terminator
+
+               if ( SetWindowTextA(edit, fileText) )
+               {
+                  success = TRUE; // It worked!
+               }
             }
-            GlobalFree(pszFileText);
+            GlobalFree(fileText);
          }
       }
-      CloseHandle(hFile);
+      CloseHandle(file);
    }
-   return bSuccess;
+   return success;
 }
 
-BOOL SaveTextFileFromEdit(HWND hEdit, PCWSTR pszFileName)
+BOOL SaveTextFileFromEdit(HWND edit, PCWSTR fileName)
 {
-   HANDLE hFile;
-   BOOL   bSuccess = FALSE;
+   HANDLE file;
+   BOOL   success = FALSE;
 
-   hFile = CreateFileW(pszFileName, GENERIC_WRITE, 0, NULL,
-                       CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-   if ( hFile != INVALID_HANDLE_VALUE )
+   file = CreateFileW(fileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+   if ( file != INVALID_HANDLE_VALUE )
    {
-      DWORD dwTextLength;
+      DWORD textLength;
 
-      dwTextLength = GetWindowTextLengthW(hEdit);
+      textLength = GetWindowTextLengthW(edit);
+
       // No need to bother if there's no text.
-      if ( dwTextLength > 0 )
+      if ( textLength > 0 )
       {
-         PSTR pszText;
-         DWORD dwBufferSize = dwTextLength + 1;
+         PSTR  text;
+         DWORD bufferSize = textLength + 1;
 
-         pszText = (PSTR) GlobalAlloc(GPTR, dwBufferSize);
-         if ( pszText != NULL )
+         text = (PSTR) GlobalAlloc(GPTR, bufferSize);
+
+         if ( text != NULL )
          {
-            if ( GetWindowTextA(hEdit, pszText, dwBufferSize) )
+            if ( GetWindowTextA(edit, text, bufferSize) )
             {
-               DWORD dwWritten;
+               DWORD written;
 
-               if ( WriteFile(hFile, pszText, dwTextLength, &dwWritten, NULL) )
-                  bSuccess = TRUE;
+               if ( WriteFile(file, text, textLength, &written, NULL) )
+               {
+                  success = TRUE;
+               }
             }
-            GlobalFree(pszText);
+            GlobalFree(text);
          }
       }
-      CloseHandle(hFile);
+      CloseHandle(file);
    }
-   return bSuccess;
+   return success;
 }
 
-void DoFileOpen(HWND hwnd)
+void DoFileOpen(HWND wnd)
 {
    OPENFILENAMEW ofn;
-   WCHAR         szFileName[ MAX_PATH ] = L"";
+   WCHAR         fileName[MAX_PATH] = L"";
 
    ZeroMemory(&ofn, sizeof(ofn));
 
    ofn.lStructSize = sizeof(ofn);
-   ofn.hwndOwner   = hwnd;
+   ofn.hwndOwner   = wnd;
    ofn.lpstrFilter = L"Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
-   ofn.lpstrFile   = szFileName;
+   ofn.lpstrFile   = fileName;
    ofn.nMaxFile    = MAX_PATH;
    ofn.Flags       = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
    ofn.lpstrDefExt = L"txt";
 
    if ( GetOpenFileNameW(&ofn) )
    {
-      HWND hEdit = GetDlgItem(hwnd, IDC_CHILD_EDIT);
-      if ( LoadTextFileToEdit(hEdit, szFileName) )
-      {
-         SendDlgItemMessageW(g_hMainWindow, IDC_MAIN_STATUS, SB_SETTEXT, 0, (LPARAM) L"Opened...");
-         SendDlgItemMessageW(g_hMainWindow, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM) szFileName);
+      HWND edit = GetDlgItem(wnd, IDC_CHILD_EDIT);
 
-         SetWindowTextW(hwnd, szFileName);
+      if ( LoadTextFileToEdit(edit, fileName) )
+      {
+         SendDlgItemMessageW(g_mainWindow, IDC_MAIN_STATUS, SB_SETTEXT, 0, (LPARAM) L"Opened...");
+         SendDlgItemMessageW(g_mainWindow, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM) fileName);
+
+         SetWindowTextW(wnd, fileName);
       }
    }
 }
 
-void DoFileSave(HWND hwnd)
+void DoFileSave(HWND wnd)
 {
    OPENFILENAMEW ofn;
-   WCHAR         szFileName[ MAX_PATH ] = L"";
+   WCHAR         fileName[MAX_PATH] = L"";
 
    ZeroMemory(&ofn, sizeof(ofn));
 
    ofn.lStructSize = sizeof(ofn);
-   ofn.hwndOwner = hwnd;
+   ofn.hwndOwner   = wnd;
    ofn.lpstrFilter = L"Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
-   ofn.lpstrFile = szFileName;
-   ofn.nMaxFile = MAX_PATH;
+   ofn.lpstrFile   = fileName;
+   ofn.nMaxFile    = MAX_PATH;
    ofn.lpstrDefExt = L"txt";
-   ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+   ofn.Flags       = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 
    if ( GetSaveFileNameW(&ofn) )
    {
-      HWND hEdit = GetDlgItem(hwnd, IDC_CHILD_EDIT);
-      if ( SaveTextFileFromEdit(hEdit, szFileName) )
-      {
-         SendDlgItemMessageW(g_hMainWindow, IDC_MAIN_STATUS, SB_SETTEXT, 0, (LPARAM) L"Saved...");
-         SendDlgItemMessageW(g_hMainWindow, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM) szFileName);
+      HWND edit = GetDlgItem(wnd, IDC_CHILD_EDIT);
 
-         SetWindowTextW(hwnd, szFileName);
+      if ( SaveTextFileFromEdit(edit, fileName) )
+      {
+         SendDlgItemMessageW(g_mainWindow, IDC_MAIN_STATUS, SB_SETTEXT, 0, (LPARAM) L"Saved...");
+         SendDlgItemMessageW(g_mainWindow, IDC_MAIN_STATUS, SB_SETTEXT, 1, (LPARAM) fileName);
+
+         SetWindowTextW(wnd, fileName);
       }
    }
 }
 
-HWND CreateNewMDIChild(HWND hMDIClient)
+HWND CreateNewMDIChild(HWND MDIClient)
 {
    MDICREATESTRUCTW mcs;
-   HWND             hChild;
+   HWND             child;
 
    mcs.szTitle = L"[Untitled]";
-   mcs.szClass = g_szChildClassName;
+   mcs.szClass = g_childClassName;
    mcs.hOwner  = GetModuleHandleW(NULL);
    mcs.x       = mcs.cx = CW_USEDEFAULT;
    mcs.y       = mcs.cy = CW_USEDEFAULT;
    mcs.style   = MDIS_ALLCHILDSTYLES;
 
-   hChild = (HWND) SendMessageW(hMDIClient, WM_MDICREATE, 0, (LONGLONG) &mcs);
-   if ( !hChild )
+   child = (HWND) SendMessageW(MDIClient, WM_MDICREATE, 0, (LONGLONG) &mcs);
+
+   if ( !child )
    {
-      MessageBoxW(hMDIClient, L"MDI Child creation failed.", L"Oh Oh...", MB_ICONEXCLAMATION | MB_OK);
+      MessageBoxW(MDIClient, L"MDI Child creation failed.", L"Oh Oh...", MB_ICONEXCLAMATION | MB_OK);
    }
-   return hChild;
+   return child;
 }
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
    switch ( msg )
    {
    case WM_CREATE:
    {
-      HWND        hTool;
-      TBBUTTON    tbb[ 3 ];
+      HWND        tool;
+      TBBUTTON    tbb[3];
       TBADDBITMAP tbab;
 
-      HWND hStatus;
-      int  statwidths[] = { 100, -1 };
+      HWND status;
+      int  statwidths[ ] = { 100, -1 };
 
       CLIENTCREATESTRUCT ccs;
 
       // Create MDI Client
 
       // Find window menu where children will be listed
-      ccs.hWindowMenu = GetSubMenu(GetMenu(hwnd), 2);
+      ccs.hWindowMenu  = GetSubMenu(GetMenu(wnd), 2);
       ccs.idFirstChild = ID_MDI_FIRSTCHILD;
 
-      g_hMDIClient = CreateWindowExW(WS_EX_CLIENTEDGE, L"mdiclient", NULL,
-                                     WS_CHILD | WS_CLIPCHILDREN | WS_VSCROLL | WS_HSCROLL | WS_VISIBLE,
-                                     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                                     hwnd, (HMENU) IDC_MAIN_MDI, GetModuleHandleW(NULL), (LPVOID) &ccs);
+      g_MDIClient = CreateWindowExW(WS_EX_CLIENTEDGE, L"mdiclient", NULL,
+                                    WS_CHILD | WS_CLIPCHILDREN | WS_VSCROLL | WS_HSCROLL | WS_VISIBLE,
+                                    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                                    wnd, (HMENU) IDC_MAIN_MDI, GetModuleHandleW(NULL), (LPVOID) &ccs);
 
-      if ( g_hMDIClient == NULL )
-         MessageBoxW(hwnd, L"Could not create MDI client.", L"Error", MB_OK | MB_ICONERROR);
+      if ( g_MDIClient == NULL )
+      {
+         MessageBoxW(wnd, L"Could not create MDI client.", L"Error", MB_OK | MB_ICONERROR);
+      }
 
       // Create Toolbar
 
-      hTool = CreateWindowExW(0, TOOLBARCLASSNAMEW, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0,
-                              hwnd, (HMENU) IDC_MAIN_TOOL, GetModuleHandleW(NULL), NULL);
-      if ( hTool == NULL )
-         MessageBoxW(hwnd, L"Could not create tool bar.", L"Error", MB_OK | MB_ICONERROR);
+      tool = CreateWindowExW(0, TOOLBARCLASSNAMEW, NULL, WS_CHILD | WS_VISIBLE, 0, 0, 0, 0,
+                             wnd, (HMENU) IDC_MAIN_TOOL, GetModuleHandleW(NULL), NULL);
+
+      if ( tool == NULL )
+      {
+         MessageBoxW(wnd, L"Could not create tool bar.", L"Error", MB_OK | MB_ICONERROR);
+      }
 
       // Send the TB_BUTTONSTRUCTSIZE message, which is required for
       // backward compatibility.
    #pragma warning (disable : 6387)
-      SendMessageW(hTool, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);
+      SendMessageW(tool, TB_BUTTONSTRUCTSIZE, (WPARAM) sizeof(TBBUTTON), 0);
 
       tbab.hInst = HINST_COMMCTRL;
       tbab.nID   = IDB_STD_SMALL_COLOR;
-      SendMessageW(hTool, TB_ADDBITMAP, 0, (LPARAM) &tbab);
+      SendMessageW(tool, TB_ADDBITMAP, 0, (LPARAM) &tbab);
 
       ZeroMemory(tbb, sizeof(tbb));
-      tbb[ 0 ].iBitmap   = STD_FILENEW;
-      tbb[ 0 ].fsState   = TBSTATE_ENABLED;
-      tbb[ 0 ].fsStyle   = TBSTYLE_BUTTON;
-      tbb[ 0 ].idCommand = ID_FILE_NEW;
+      tbb[0].iBitmap   = STD_FILENEW;
+      tbb[0].fsState   = TBSTATE_ENABLED;
+      tbb[0].fsStyle   = TBSTYLE_BUTTON;
+      tbb[0].idCommand = ID_FILE_NEW;
 
-      tbb[ 1 ].iBitmap   = STD_FILEOPEN;
-      tbb[ 1 ].fsState   = TBSTATE_ENABLED;
-      tbb[ 1 ].fsStyle   = TBSTYLE_BUTTON;
-      tbb[ 1 ].idCommand = ID_FILE_OPEN;
+      tbb[1].iBitmap   = STD_FILEOPEN;
+      tbb[1].fsState   = TBSTATE_ENABLED;
+      tbb[1].fsStyle   = TBSTYLE_BUTTON;
+      tbb[1].idCommand = ID_FILE_OPEN;
 
-      tbb[ 2 ].iBitmap   = STD_FILESAVE;
-      tbb[ 2 ].fsState   = TBSTATE_ENABLED;
-      tbb[ 2 ].fsStyle   = TBSTYLE_BUTTON;
-      tbb[ 2 ].idCommand = ID_FILE_SAVEAS;
+      tbb[2].iBitmap   = STD_FILESAVE;
+      tbb[2].fsState   = TBSTATE_ENABLED;
+      tbb[2].fsStyle   = TBSTYLE_BUTTON;
+      tbb[2].idCommand = ID_FILE_SAVEAS;
 
-      SendMessageW(hTool, TB_ADDBUTTONS, sizeof(tbb) / sizeof(TBBUTTON), (LPARAM) &tbb);
+      SendMessageW(tool, TB_ADDBUTTONS, sizeof(tbb) / sizeof(TBBUTTON), (LPARAM) &tbb);
 
       // Create Status bar
 
-      hStatus = CreateWindowExW(0, STATUSCLASSNAMEW, NULL,
-                                WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0,
-                                hwnd, (HMENU) IDC_MAIN_STATUS, GetModuleHandleW(NULL), NULL);
+      status = CreateWindowExW(0, STATUSCLASSNAMEW, NULL,
+                               WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0,
+                               wnd, (HMENU) IDC_MAIN_STATUS, GetModuleHandleW(NULL), NULL);
 
-      SendMessageW(hStatus, SB_SETPARTS, sizeof(statwidths) / sizeof(int), (LPARAM) statwidths);
-      SendMessageW(hStatus, SB_SETTEXT, 0, (LPARAM) L"Hi there :)");
+      SendMessageW(status, SB_SETPARTS, sizeof(statwidths) / sizeof(int), (LPARAM) statwidths);
+      SendMessageW(status, SB_SETTEXT, 0, (LPARAM) L"Hi there :)");
    }
    break;
 
    case WM_SIZE:
    {
-      HWND hTool;
-      RECT rcTool;
-      int iToolHeight;
+      HWND tool;
+      RECT toolRect;
+      int  toolHeight;
 
-      HWND hStatus;
-      RECT rcStatus;
-      int iStatusHeight;
+      HWND status;
+      RECT statusRect;
+      int  statusHeight;
 
-      HWND hMDI;
-      int iMDIHeight;
-      RECT rcClient;
+      HWND MDI;
+      int  MDIHeight;
+      RECT client;
 
       // Size toolbar and get height
 
-      hTool = GetDlgItem(hwnd, IDC_MAIN_TOOL);
-      SendMessageW(hTool, TB_AUTOSIZE, 0, 0);
+      tool = GetDlgItem(wnd, IDC_MAIN_TOOL);
+      SendMessageW(tool, TB_AUTOSIZE, 0, 0);
 
-      GetWindowRect(hTool, &rcTool);
-      iToolHeight = rcTool.bottom - rcTool.top;
+      GetWindowRect(tool, &toolRect);
+      toolHeight = toolRect.bottom - toolRect.top;
 
       // Size status bar and get height
 
-      hStatus = GetDlgItem(hwnd, IDC_MAIN_STATUS);
-      SendMessageW(hStatus, WM_SIZE, 0, 0);
+      status = GetDlgItem(wnd, IDC_MAIN_STATUS);
+      SendMessageW(status, WM_SIZE, 0, 0);
 
-      GetWindowRect(hStatus, &rcStatus);
-      iStatusHeight = rcStatus.bottom - rcStatus.top;
+      GetWindowRect(status, &statusRect);
+      statusHeight = statusRect.bottom - statusRect.top;
 
       // Calculate remaining height and size edit
 
-      GetClientRect(hwnd, &rcClient);
+      GetClientRect(wnd, &client);
 
-      iMDIHeight = rcClient.bottom - iToolHeight - iStatusHeight;
+      MDIHeight = client.bottom - toolHeight - statusHeight;
 
-      hMDI = GetDlgItem(hwnd, IDC_MAIN_MDI);
-      SetWindowPos(hMDI, NULL, 0, iToolHeight, rcClient.right, iMDIHeight, SWP_NOZORDER);
+      MDI = GetDlgItem(wnd, IDC_MAIN_MDI);
+      SetWindowPos(MDI, NULL, 0, toolHeight, client.right, MDIHeight, SWP_NOZORDER);
    }
    break;
 
    case WM_CLOSE:
-      DestroyWindow(hwnd);
+      DestroyWindow(wnd);
       break;
 
    case WM_DESTROY:
@@ -292,16 +309,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       switch ( LOWORD(wParam) )
       {
       case ID_FILE_EXIT:
-         PostMessage(hwnd, WM_CLOSE, 0, 0);
+         PostMessageW(wnd, WM_CLOSE, 0, 0);
          break;
 
       case ID_FILE_NEW:
-         CreateNewMDIChild(g_hMDIClient);
+         CreateNewMDIChild(g_MDIClient);
          break;
 
       case ID_FILE_OPEN:
       {
-         HWND hChild = CreateNewMDIChild(g_hMDIClient);
+         HWND hChild = CreateNewMDIChild(g_MDIClient);
+
          if ( hChild )
          {
             DoFileOpen(hChild);
@@ -311,7 +329,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
       case ID_FILE_CLOSE:
       {
-         HWND hChild = (HWND) SendMessageW(g_hMDIClient, WM_MDIGETACTIVE, 0, 0);
+         HWND hChild = (HWND) SendMessageW(g_MDIClient, WM_MDIGETACTIVE, 0, 0);
+
          if ( hChild )
          {
             SendMessageW(hChild, WM_CLOSE, 0, 0);
@@ -320,22 +339,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       break;
 
       case ID_WINDOW_TILE:
-         SendMessageW(g_hMDIClient, WM_MDITILE, 0, 0);
+         SendMessageW(g_MDIClient, WM_MDITILE, 0, 0);
          break;
 
       case ID_WINDOW_CASCADE:
-         SendMessageW(g_hMDIClient, WM_MDICASCADE, 0, 0);
+         SendMessageW(g_MDIClient, WM_MDICASCADE, 0, 0);
          break;
 
       default:
       {
          if ( LOWORD(wParam) >= ID_MDI_FIRSTCHILD )
          {
-            DefFrameProcW(hwnd, g_hMDIClient, WM_COMMAND, wParam, lParam);
+            DefFrameProcW(wnd, g_MDIClient, WM_COMMAND, wParam, lParam);
          }
          else
          {
-            HWND hChild = (HWND) SendMessageW(g_hMDIClient, WM_MDIGETACTIVE, 0, 0);
+            HWND hChild = (HWND) SendMessageW(g_MDIClient, WM_MDIGETACTIVE, 0, 0);
+
             if ( hChild )
             {
                SendMessageW(hChild, WM_COMMAND, wParam, lParam);
@@ -346,7 +366,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       break;
 
    default:
-      return DefFrameProcW(hwnd, g_hMDIClient, msg, wParam, lParam);
+      return DefFrameProcW(wnd, g_MDIClient, msg, wParam, lParam);
    }
    return 0;
 }
@@ -357,47 +377,54 @@ LRESULT CALLBACK MDIChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
    {
    case WM_CREATE:
    {
-      HFONT hfDefault;
-      HWND hEdit;
+      HFONT fontDefault;
+      HWND  edit;
 
       // Create Edit Control
 
-      hEdit = CreateWindowExW(WS_EX_CLIENTEDGE, L"EDIT", L"",
-                              WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL,
-                              0, 0, 100, 100, hwnd, (HMENU) IDC_CHILD_EDIT, GetModuleHandleW(NULL), NULL);
-      if ( hEdit == NULL )
-         MessageBoxW(hwnd, L"Could not create edit box.", L"Error", MB_OK | MB_ICONERROR);
+      edit = CreateWindowExW(WS_EX_CLIENTEDGE, L"EDIT", L"",
+                             WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL,
+                             0, 0, 100, 100, hwnd, (HMENU) IDC_CHILD_EDIT, GetModuleHandleW(NULL), NULL);
 
-      hfDefault = (HFONT) GetStockObject(DEFAULT_GUI_FONT);
-      SendMessageW(hEdit, WM_SETFONT, (WPARAM) hfDefault, MAKELPARAM(FALSE, 0));
+      if ( edit == NULL )
+      {
+         MessageBoxW(hwnd, L"Could not create edit box.", L"Error", MB_OK | MB_ICONERROR);
+      }
+
+      fontDefault = (HFONT) GetStockObject(DEFAULT_GUI_FONT);
+      SendMessageW(edit, WM_SETFONT, (WPARAM) fontDefault, MAKELPARAM(FALSE, 0));
    }
    break;
 
    case WM_MDIACTIVATE:
    {
-      HMENU hMenu, hFileMenu;
-      UINT EnableFlag;
+      HMENU menu;
+      HMENU fileMenu;
+      UINT  enableFlag;
 
-      hMenu = GetMenu(g_hMainWindow);
+      menu = GetMenu(g_mainWindow);
+
       if ( hwnd == (HWND) lParam )
-      {	   //being activated, enable the menus
-         EnableFlag = MF_ENABLED;
+      {
+         //being activated, enable the menus
+         enableFlag = MF_ENABLED;
       }
       else
-      {						   //being de-activated, gray the menus
-         EnableFlag = MF_GRAYED;
+      {
+         //being de-activated, gray the menus
+         enableFlag = MF_GRAYED;
       }
 
-      EnableMenuItem(hMenu, 1, MF_BYPOSITION | EnableFlag);
-      EnableMenuItem(hMenu, 2, MF_BYPOSITION | EnableFlag);
+      EnableMenuItem(menu, 1, MF_BYPOSITION | enableFlag);
+      EnableMenuItem(menu, 2, MF_BYPOSITION | enableFlag);
 
-      hFileMenu = GetSubMenu(hMenu, 0);
-      EnableMenuItem(hFileMenu, ID_FILE_SAVEAS, MF_BYCOMMAND | EnableFlag);
+      fileMenu = GetSubMenu(menu, 0);
+      EnableMenuItem(fileMenu, ID_FILE_SAVEAS, MF_BYCOMMAND | enableFlag);
 
-      EnableMenuItem(hFileMenu, ID_FILE_CLOSE, MF_BYCOMMAND | EnableFlag);
-      EnableMenuItem(hFileMenu, ID_FILE_CLOSEALL, MF_BYCOMMAND | EnableFlag);
+      EnableMenuItem(fileMenu, ID_FILE_CLOSE, MF_BYCOMMAND | enableFlag);
+      EnableMenuItem(fileMenu, ID_FILE_CLOSEALL, MF_BYCOMMAND | enableFlag);
 
-      DrawMenuBar(g_hMainWindow);
+      DrawMenuBar(g_mainWindow);
    }
    break;
 
@@ -428,15 +455,15 @@ LRESULT CALLBACK MDIChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 
    case WM_SIZE:
    {
-      HWND hEdit;
-      RECT rcClient;
+      HWND edit;
+      RECT client;
 
       // Calculate remaining height and size edit
 
-      GetClientRect(hwnd, &rcClient);
+      GetClientRect(hwnd, &client);
 
-      hEdit = GetDlgItem(hwnd, IDC_CHILD_EDIT);
-      SetWindowPos(hEdit, NULL, 0, 0, rcClient.right, rcClient.bottom, SWP_NOZORDER);
+      edit = GetDlgItem(hwnd, IDC_CHILD_EDIT);
+      SetWindowPos(edit, NULL, 0, 0, client.right, client.bottom, SWP_NOZORDER);
    }
    return DefMDIChildProcW(hwnd, msg, wParam, lParam);
 
@@ -446,22 +473,22 @@ LRESULT CALLBACK MDIChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
    return 0;
 }
 
-BOOL SetUpMDIChildWindowClass(HINSTANCE hInstance)
+BOOL SetUpMDIChildWindowClass(HINSTANCE inst)
 {
-   WNDCLASSEXW wc;
+   WNDCLASSEXW wc = { 0 };
 
-   wc.cbSize        = sizeof(WNDCLASSEX);
+   wc.cbSize        = sizeof(WNDCLASSEXW);
    wc.style         = CS_HREDRAW | CS_VREDRAW;
    wc.lpfnWndProc   = MDIChildWndProc;
    wc.cbClsExtra    = 0;
    wc.cbWndExtra    = 0;
-   wc.hInstance     = hInstance;
-   wc.hIcon         = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-   wc.hIconSm       = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hInstance     = inst;
+   wc.hIcon         = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hIconSm       = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
    wc.hCursor       = (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
-   wc.hbrBackground = (HBRUSH) (COLOR_3DFACE + 1);
+   wc.hbrBackground = (HBRUSH)  (COLOR_3DFACE + 1);
    wc.lpszMenuName  = NULL;
-   wc.lpszClassName = g_szChildClassName;
+   wc.lpszClassName = g_childClassName;
 
    if ( !RegisterClassExW(&wc) )
    {
@@ -472,27 +499,30 @@ BOOL SetUpMDIChildWindowClass(HINSTANCE hInstance)
       return TRUE;
 }
 
-int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
-                    _In_ PWSTR lpCmdLine, _In_ int nCmdShow)
+int WINAPI wWinMain(_In_ HINSTANCE inst, _In_opt_ HINSTANCE prevInst,
+                    _In_ PWSTR cmdLine, _In_ int cmdShow)
 {
-   WNDCLASSEXW wc;
-   HWND        hwnd;
-   MSG         Msg;
+   UNREFERENCED_PARAMETER(prevInst);
+   UNREFERENCED_PARAMETER(cmdLine);
 
-   InitCommonControls();
+   WNDCLASSEXW wc = { 0 };
+   HWND        wnd;
+   MSG         msg;
 
-   wc.cbSize        = sizeof(WNDCLASSEX);
+   InitCommonControls( );
+
+   wc.cbSize        = sizeof(WNDCLASSEXW);
    wc.style         = 0;
    wc.lpfnWndProc   = WndProc;
    wc.cbClsExtra    = 0;
    wc.cbWndExtra    = 0;
-   wc.hInstance     = hInstance;
-   wc.hIcon         = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
-   wc.hIconSm       = (HICON) LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hInstance     = inst;
+   wc.hIcon         = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
+   wc.hIconSm       = (HICON)   LoadImageW(NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
    wc.hCursor       = (HCURSOR) LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED);
-   wc.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+   wc.hbrBackground = (HBRUSH)  (COLOR_WINDOW + 1);
    wc.lpszMenuName  = MAKEINTRESOURCEW(IDR_MAINMENU);
-   wc.lpszClassName = g_szClassName;
+   wc.lpszClassName = g_className;
 
    if ( !RegisterClassExW(&wc) )
    {
@@ -500,34 +530,36 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
       return 0;
    }
 
-   if ( !SetUpMDIChildWindowClass(hInstance) )
+   if ( !SetUpMDIChildWindowClass(inst) )
+   {
       return 0;
+   }
 
-   hwnd = CreateWindowExW(0,
-                          g_szClassName,
-                          L"theForger's Tutorial Application",
-                          WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
-                          CW_USEDEFAULT, CW_USEDEFAULT, 480, 320,
-                          NULL, NULL, hInstance, NULL);
+   wnd = CreateWindowExW(0,
+                         g_className,
+                         L"theForger's Tutorial Application",
+                         WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
+                         CW_USEDEFAULT, CW_USEDEFAULT, 480, 320,
+                         NULL, NULL, inst, NULL);
 
-   if ( hwnd == NULL )
+   if ( wnd == NULL )
    {
       MessageBoxW(NULL, L"Window Creation Failed!", L"Error!", MB_ICONEXCLAMATION | MB_OK);
       return 0;
    }
 
-   g_hMainWindow = hwnd;
+   g_mainWindow = wnd;
 
-   ShowWindow(hwnd, nCmdShow);
-   UpdateWindow(hwnd);
+   ShowWindow(wnd, cmdShow);
+   UpdateWindow(wnd);
 
-   while ( GetMessageW(&Msg, NULL, 0, 0) > 0 )
+   while ( GetMessageW(&msg, NULL, 0, 0) > 0 )
    {
-      if ( !TranslateMDISysAccel(g_hMDIClient, &Msg) )
+      if ( !TranslateMDISysAccel(g_MDIClient, &msg) )
       {
-         TranslateMessage(&Msg);
-         DispatchMessageW(&Msg);
+         TranslateMessage(&msg);
+         DispatchMessageW(&msg);
       }
    }
-   return (int) Msg.wParam;
+   return (int) msg.wParam;
 }
