@@ -1,6 +1,6 @@
 #include <windows.h>
 
-const PCWSTR g_className = L"myWindowClass";
+PCWSTR g_className = L"myWindowClass";
 
 // Step 4: the Window Procedure
 LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
