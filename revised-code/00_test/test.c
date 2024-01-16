@@ -11,5 +11,6 @@ int WINAPI wWinMain(_In_	  HINSTANCE inst,
    UNREFERENCED_PARAMETER(cmdShow);
 
    MessageBoxW(NULL, L"Narf!", L"Pinky says...", MB_OK | MB_ICONEXCLAMATION);
+
    return 0;
 }
