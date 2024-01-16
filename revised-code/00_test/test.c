@@ -1,9 +1,9 @@
 #include <windows.h>
 
-int WINAPI wWinMain(_In_	  HINSTANCE inst,
+int WINAPI wWinMain(_In_     HINSTANCE inst,
                     _In_opt_ HINSTANCE prevInst,
-                    _In_	  PWSTR		cmdLine,
-                    _In_	  int			cmdShow)
+                    _In_     PWSTR     cmdLine,
+                    _In_     int       cmdShow)
 {
    UNREFERENCED_PARAMETER(inst);
    UNREFERENCED_PARAMETER(prevInst);
