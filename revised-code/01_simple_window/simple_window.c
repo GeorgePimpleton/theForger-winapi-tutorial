@@ -57,12 +57,12 @@ int WINAPI wWinMain(_In_     HINSTANCE inst,
    }
 
    // Step 2: Creating (and showing) the Window
-   wnd = CreateWindowEx(WS_EX_CLIENTEDGE,
-                        g_className,
-                        L"The title of my window",
-                        WS_OVERLAPPEDWINDOW,
-                        CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
-                        NULL, NULL, inst, NULL);
+   wnd = CreateWindowExW(WS_EX_CLIENTEDGE,
+                         g_className,
+                         L"The title of my window",
+                         WS_OVERLAPPEDWINDOW,
+                         CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
+                         NULL, NULL, inst, NULL);
 
    if ( wnd == NULL )
    {
