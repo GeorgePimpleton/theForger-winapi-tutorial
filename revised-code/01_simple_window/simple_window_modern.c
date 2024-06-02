@@ -1,5 +1,7 @@
 #include <windows.h>
 
+// WinAPI has several pointer to string data type
+// this is a constant pointer
 PCWSTR g_className = L"myWindowClass";
 
 // Step 4: the Window Procedure
@@ -80,5 +82,5 @@ int WINAPI wWinMain(_In_     HINSTANCE inst,
       TranslateMessage(&msg);
       DispatchMessageW(&msg);
    }
-   return (int) msg.wParam;
+   return (int) msg.wParam;  // needed to stop VS from whinging about possible loss of data from a conversion
 }
