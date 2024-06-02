@@ -7,6 +7,6 @@ I wondered if a simple app that displays just a message box was possible using M
 
 This example shows that MFC is not as feature rich as the Windows Desktop WinAPI in some aspects when creating minimal apps, using Message boxes, for example.  Being unable to easily specify a window title is not good, doing so requires more code.
 
-This minimal MFC example also causes an app crash on exit.  \*\****OUCH***\*\*
+This minimal MFC example also causes an app crash on exit that goes unnoticed executing the app without debugging.  \*\****OUCH***\*\*
 
 The rest of the code examples (except for the next one) will NOT be redone using MFC.  Doing it yourself would be a learning experience after learning C++ and the WinAPI.
