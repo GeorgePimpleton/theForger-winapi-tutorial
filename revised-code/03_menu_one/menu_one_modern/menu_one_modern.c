@@ -32,6 +32,7 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
    default:
       return DefWindowProcW(wnd, msg, wParam, lParam);
    }
+
    return 0;
 }
 
@@ -84,5 +85,6 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE prevInst,
       TranslateMessage(&msg);
       DispatchMessageW(&msg);
    }
+
    return (int) msg.wParam;
 }
