@@ -20,11 +20,11 @@ LRESULT CALLBACK WndProc(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
       hSubMenu = CreatePopupMenu( );
       AppendMenuW(hSubMenu, MF_STRING, ID_FILE_EXIT, L"E&xit");
-      AppendMenuW(hMenu, MF_STRING | MF_POPUP, (UINT) hSubMenu, L"&File");
+      AppendMenuW(hMenu, MF_STRING | MF_POPUP, (UINT_PTR) hSubMenu, L"&File");
 
       hSubMenu = CreatePopupMenu( );
       AppendMenuW(hSubMenu, MF_STRING, ID_STUFF_GO, L"&Go");
-      AppendMenuW(hMenu, MF_STRING | MF_POPUP, (UINT) hSubMenu, L"&Stuff");
+      AppendMenuW(hMenu, MF_STRING | MF_POPUP, (UINT_PTR) hSubMenu, L"&Stuff");
 
       SetMenu(wnd, hMenu);
 
@@ -131,5 +131,6 @@ int WINAPI wWinMain(_In_ HINSTANCE inst, _In_opt_ HINSTANCE prevInst,
       TranslateMessage(&msg);
       DispatchMessageW(&msg);
    }
+
    return (int) msg.wParam;
 }
