@@ -10,3 +10,6 @@ For most of the examples there are two different updates to the code.
 2. Using modern WinAPI features.
 
 Enjoy!
+
+### Notes
+The first two examples have additional code samples using the Microsoft Foundation Classes (MFC).  To show the differences between writing code using the C-based Desktop WinAPI and the C++-based MFC framework.
