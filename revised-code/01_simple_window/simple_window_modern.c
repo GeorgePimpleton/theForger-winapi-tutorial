@@ -1,17 +1,9 @@
 #include <windows.h>
 
-// WinAPI has several pointer to string data types
-// this type is a constant ptr-to-str
-// https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types
-PCWSTR g_className = L"myWindowClass";
+// Step 5: the Window Procedure
+LRESULT CALLBACK WndProc( HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
-// Step 4: the Window Procedure
-LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
-
-// added a generic error reporting function that terminates the app
-void ErrorQuit( PCWSTR );
-
-// Step 0: Desktop WinAPI app entry point
+// Step 1: Desktop WinAPI app entry point
 // added SAL (source-code annotation language) to WinMain
 // https://learn.microsoft.com/en-us/cpp/code-quality/understanding-sal?view=msvc-170
 int WINAPI wWinMain( _In_     HINSTANCE inst,
@@ -20,13 +12,17 @@ int WINAPI wWinMain( _In_     HINSTANCE inst,
                      _In_     int       cmdShow )
 {
    UNREFERENCED_PARAMETER( prevInst );
-   UNREFERENCED_PARAMETER( cmdLine );
+
+   // WinAPI has several pointer to string data types
+   // this type is a constant ptr-to-str
+   // https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types
+   PCWSTR className = L"myWindowClass";  // <-- no need for this to be a global
 
    WNDCLASSEXW wc = { 0 };
    HWND        wnd;
    MSG         msg;
 
-   // Step 1: Registering the Window Class
+   // Step 2: Registering the Window Class
    wc.cbSize        = sizeof( WNDCLASSEXW );
    wc.style         = 0;
    wc.lpfnWndProc   = WndProc;
@@ -37,17 +33,18 @@ int WINAPI wWinMain( _In_     HINSTANCE inst,
    wc.hCursor       = ( HCURSOR ) LoadImageW( NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED );
    wc.hbrBackground = ( HBRUSH ) ( COLOR_WINDOW + 1 );
    wc.lpszMenuName  = NULL;
-   wc.lpszClassName = g_className;
+   wc.lpszClassName = className;
    wc.hIconSm       = ( HICON ) LoadImageW( NULL, IDI_APPLICATION, IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
 
    if ( !RegisterClassExW( &wc ) )
    {
-      ErrorQuit( L"Window Registration Failed!" );
+      MessageBoxW( NULL, L"Window Registration Failed!", L"Critical Error", MB_OK | MB_ICONERROR );
+      return 0;
    }
 
-   // Step 2: Creating (and showing) the Window
+   // Step 3: Creating (and showing) the Window
    wnd = CreateWindowExW( WS_EX_CLIENTEDGE,
-                          g_className,
+                          className,
                           L"The title of my window",
                           WS_OVERLAPPEDWINDOW,
                           CW_USEDEFAULT, CW_USEDEFAULT,
@@ -56,24 +53,25 @@ int WINAPI wWinMain( _In_     HINSTANCE inst,
 
    if ( wnd == NULL )
    {
-      ErrorQuit( L"Window Creation Failed!" );
+      MessageBoxW( NULL, L"Window Creation Failed!", L"Critical Error", MB_OK | MB_ICONERROR );
+      return 0;
    }
 
    ShowWindow( wnd, cmdShow );
    UpdateWindow( wnd );
 
-   // Step 3: The Message Loop
+   // Step 4: The Message Loop
    while ( GetMessageW( &msg, NULL, 0, 0 ) > 0 )
    {
       TranslateMessage( &msg );
       DispatchMessageW( &msg );
    }
 
-   // needed to stop VS from whinging about possible loss of data from a conversion
+   // needed to stop VS from whinging about possible loss of data
    return ( int ) msg.wParam;
 }
 
-// Step 4: the Window Procedure
+// Step 5: the Window Procedure
 LRESULT CALLBACK WndProc( HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
    switch ( msg )
@@ -88,10 +86,4 @@ LRESULT CALLBACK WndProc( HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam )
    }
 
    return DefWindowProcW( wnd, msg, wParam, lParam );
-}
-
-void ErrorQuit( PCWSTR errMsg )
-{
-   MessageBoxW( NULL, errMsg, L"Critical Error", MB_OK | MB_ICONERROR );
-   PostQuitMessage( 0 );
 }

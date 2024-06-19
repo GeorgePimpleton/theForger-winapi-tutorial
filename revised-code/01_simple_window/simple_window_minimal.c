@@ -27,18 +27,18 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
    MSG Msg;
 
    //Step 1: Registering the Window Class
-   wc.cbSize		 = sizeof( WNDCLASSEX );
-   wc.style		 = 0;
-   wc.lpfnWndProc	 = WndProc;
-   wc.cbClsExtra	 = 0;
-   wc.cbWndExtra	 = 0;
-   wc.hInstance	 = hInstance;
-   wc.hIcon		 = LoadIcon( NULL, IDI_APPLICATION );
-   wc.hCursor		 = LoadCursor( NULL, IDC_ARROW );
+   wc.cbSize        = sizeof( WNDCLASSEX );
+   wc.style         = 0;
+   wc.lpfnWndProc   = WndProc;
+   wc.cbClsExtra    = 0;
+   wc.cbWndExtra    = 0;
+   wc.hInstance     = hInstance;
+   wc.hIcon         = LoadIcon( NULL, IDI_APPLICATION );
+   wc.hCursor       = LoadCursor( NULL, IDC_ARROW );
    wc.hbrBackground = ( HBRUSH ) ( COLOR_WINDOW + 1 );
    wc.lpszMenuName  = NULL;
    wc.lpszClassName = g_szClassName;
-   wc.hIconSm		 = LoadIcon( NULL, IDI_APPLICATION );
+   wc.hIconSm       = LoadIcon( NULL, IDI_APPLICATION );
 
    if ( !RegisterClassEx( &wc ) )
    {
@@ -58,7 +58,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
    if ( hwnd == NULL )
    {
-      MessageBox( NULL, TEXT( "Window Creation Failed!" ) , TEXT( "Error!" ),
+      MessageBox( NULL, TEXT( "Window Creation Failed!" ), TEXT( "Error!" ),
                   MB_ICONEXCLAMATION | MB_OK );
       return 0;
    }
