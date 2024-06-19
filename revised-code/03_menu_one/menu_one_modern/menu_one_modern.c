@@ -10,6 +10,9 @@ int WINAPI wWinMain( _In_     HINSTANCE hInstance,
                      _In_     PWSTR    cmdLine,
                      _In_     int      cmdShow )
 {
+   UNREFERENCED_PARAMETER( prevInst );
+   UNREFERENCED_PARAMETER( cmdLine );
+
    WNDCLASSEXW wc  = { 0 };
    HWND        wnd;
    MSG         msg;
@@ -20,10 +23,10 @@ int WINAPI wWinMain( _In_     HINSTANCE hInstance,
    wc.cbClsExtra    = 0;
    wc.cbWndExtra    = 0;
    wc.hInstance     = hInstance;
-   wc.hIcon         = ( HICON )   LoadImageW( GetModuleHandleW( NULL ), MAKEINTRESOURCEW( IDI_MYICON ), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
-   wc.hIconSm       = ( HICON )   LoadImageW( GetModuleHandleW( NULL ), MAKEINTRESOURCEW( IDI_MYICON ), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
+   wc.hIcon         = ( HICON ) LoadImageW( GetModuleHandleW( NULL ), MAKEINTRESOURCEW( IDI_MYICON ), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
+   wc.hIconSm       = ( HICON ) LoadImageW( GetModuleHandleW( NULL ), MAKEINTRESOURCEW( IDI_MYICON ), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR );
    wc.hCursor       = ( HCURSOR ) LoadImageW( NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED );
-   wc.hbrBackground = ( HBRUSH )  ( COLOR_WINDOW + 1 );
+   wc.hbrBackground = ( HBRUSH ) ( COLOR_WINDOW + 1 );
    wc.lpszMenuName  = MAKEINTRESOURCE( IDR_MYMENU );
    wc.lpszClassName = g_className;
 
