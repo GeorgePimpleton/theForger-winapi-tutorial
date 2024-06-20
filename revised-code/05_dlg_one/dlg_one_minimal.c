@@ -77,8 +77,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPSTR lpCmdLine, int nCmdShow )
 {
    WNDCLASSEX wc;
-   HWND hwnd;
-   MSG Msg;
+   HWND       hwnd;
+   MSG        Msg;
 
    wc.cbSize        = sizeof( WNDCLASSEX );
    wc.style         = 0;
