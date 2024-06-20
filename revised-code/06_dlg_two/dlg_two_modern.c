@@ -5,14 +5,17 @@
 PCWSTR g_className = L"myWindowClass";
 HWND   g_toolbar   = NULL;
 
-BOOL CALLBACK ToolDlgProc( HWND, UINT, WPARAM, LPARAM );
+BOOL    CALLBACK ToolDlgProc( HWND, UINT, WPARAM, LPARAM );
 LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
 
 int WINAPI wWinMain( _In_     HINSTANCE inst,
                      _In_opt_ HINSTANCE prevInst,
-                     _In_     PWSTR    cmdLine,
-                     _In_     int      cmdShow )
+                     _In_     PWSTR     cmdLine,
+                     _In_     int       cmdShow )
 {
+   UNREFERENCED_PARAMETER( prevInst );
+   UNREFERENCED_PARAMETER( cmdLine );
+
    WNDCLASSEXW wc = { 0 };
    HWND        wnd;
    MSG         msg;
