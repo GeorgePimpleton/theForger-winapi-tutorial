@@ -12,6 +12,7 @@ int WINAPI wWinMain( _In_     HINSTANCE inst,
                      _In_     int       cmdShow )
 {
    UNREFERENCED_PARAMETER( prevInst );
+   UNREFERENCED_PARAMETER( cmdLine );
 
    WNDCLASSEXW wc = { 0 };
    HWND        wnd;
