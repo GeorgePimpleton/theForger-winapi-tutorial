@@ -9,10 +9,11 @@ LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
 
 int WINAPI wWinMain( _In_     HINSTANCE inst,
                      _In_opt_ HINSTANCE prevInst,
-                     _In_     PWSTR    cmdLine,
-                     _In_     int      cmdShow )
+                     _In_     PWSTR     cmdLine,
+                     _In_     int       cmdShow )
 {
    UNREFERENCED_PARAMETER( prevInst );
+   UNREFERENCED_PARAMETER( cmdLine );
 
    WNDCLASSEXW wc = { 0 };
    HWND        wnd;
@@ -25,11 +26,11 @@ int WINAPI wWinMain( _In_     HINSTANCE inst,
    wc.cbWndExtra    = 0;
    wc.hInstance     = inst;
    wc.hIcon         = NULL;
+   wc.hIconSm       = NULL;
    wc.hCursor       = ( HCURSOR ) LoadImageW( NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_SHARED );
    wc.hbrBackground = ( HBRUSH )  ( COLOR_WINDOW + 1 );
    wc.lpszMenuName  = NULL;
    wc.lpszClassName = g_className;
-   wc.hIconSm       = NULL;
 
    if ( !RegisterClassExW( &wc ) )
    {
