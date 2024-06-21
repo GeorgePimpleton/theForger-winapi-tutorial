@@ -6,10 +6,11 @@ LRESULT CALLBACK WndProc( HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 int WINAPI wWinMain( _In_     HINSTANCE inst,
                      _In_opt_ HINSTANCE prevInst,
-                     _In_     PWSTR    cmdLine,
-                     _In_     int      cmdShow )
+                     _In_     PWSTR     cmdLine,
+                     _In_     int       cmdShow )
 {
    UNREFERENCED_PARAMETER( prevInst );
+   UNREFERENCED_PARAMETER( cmdLine );
 
    WNDCLASSEXW wc        = { 0 };
    HWND        wnd;
@@ -81,7 +82,7 @@ LRESULT CALLBACK WndProc( HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
       fontDefault = ( HFONT ) GetStockObject( DEFAULT_GUI_FONT );
 
-   // suppress one time a warning
+   // suppress one time the warning
    // https://learn.microsoft.com/en-us/cpp/preprocessor/warning?view=msvc-170
    #pragma warning (suppress : 6387)
       SendMessageW( edit, WM_SETFONT, ( WPARAM ) fontDefault, MAKELPARAM( FALSE, 0 ) );
@@ -107,9 +108,7 @@ LRESULT CALLBACK WndProc( HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam )
    case WM_DESTROY:
       PostQuitMessage( 0 );
       break;
-
-   default:
-      return DefWindowProcW( wnd, msg, wParam, lParam );
    }
-   return 0;
+
+   return DefWindowProcW( wnd, msg, wParam, lParam );
 }

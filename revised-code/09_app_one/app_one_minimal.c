@@ -11,7 +11,7 @@ LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
    case WM_CREATE:
    {
       HFONT hfDefault;
-      HWND hEdit;
+      HWND  hEdit;
 
       hEdit = CreateWindowEx( WS_EX_CLIENTEDGE, TEXT( "EDIT" ), TEXT( "" ),
                               WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL,
