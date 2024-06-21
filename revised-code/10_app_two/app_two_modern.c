@@ -1,20 +1,19 @@
 #include <windows.h>
 #include "resource.h"
 
-#define IDC_MAIN_EDIT 101
-
-BOOL LoadTextFileToEdit( HWND, PCSTR );
-BOOL SaveTextFileFromEdit( HWND, PCSTR );
-void DoFileOpen( HWND );
-void DoFileSave( HWND );
-LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM);
+BOOL    LoadTextFileToEdit( HWND, PCSTR );
+BOOL    SaveTextFileFromEdit( HWND, PCSTR );
+void    DoFileOpen( HWND );
+void    DoFileSave( HWND );
+LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
 
 int WINAPI wWinMain( _In_     HINSTANCE inst,
                      _In_opt_ HINSTANCE prevInst,
                      _In_     PWSTR     cmdLine,
-                     _In_     int      cmdShow )
+                     _In_     int       cmdShow )
 {
    UNREFERENCED_PARAMETER( prevInst );
+   UNREFERENCED_PARAMETER( cmdLine );
 
    WNDCLASSEXW wc        = { 0 };
    HWND        wnd;
