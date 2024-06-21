@@ -10,14 +10,16 @@
 #define IDC_MAIN_TOOL	102
 #define IDC_MAIN_STATUS	103
 
-BOOL LoadTextFileToEdit( HWND, PCWSTR );
-BOOL SaveTextFileFromEdit( HWND, PCWSTR );
-void DoFileOpen( HWND );
-void DoFileSave( HWND );
+BOOL    LoadTextFileToEdit( HWND, PCWSTR );
+BOOL    SaveTextFileFromEdit( HWND, PCWSTR );
+void    DoFileOpen( HWND );
+void    DoFileSave( HWND );
 LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
 
-int WINAPI wWinMain( _In_ HINSTANCE inst, _In_opt_ HINSTANCE prevInst,
-                     _In_ PWSTR cmdLine, _In_ int cmdShow )
+int WINAPI wWinMain( _In_     HINSTANCE inst,
+                     _In_opt_ HINSTANCE prevInst,
+                     _In_     PWSTR     cmdLine,
+                     _In_     int       cmdShow )
 {
    UNREFERENCED_PARAMETER( prevInst );
    UNREFERENCED_PARAMETER( cmdLine );
