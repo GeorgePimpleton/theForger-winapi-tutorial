@@ -8,7 +8,6 @@ BOOL CALLBACK DlgProc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
    {
    case WM_INITDIALOG:
       // This is where we set up the dialog box, and initialise any default values
-
       SetDlgItemText( hwnd, IDC_TEXT, TEXT( "This is a string" ) );
       SetDlgItemInt( hwnd, IDC_NUMBER, 5, FALSE );
       break;
@@ -19,7 +18,6 @@ BOOL CALLBACK DlgProc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
       {
          // When somebody clicks the Add button, first we get the number of
          // they entered
-
          BOOL bSuccess;
          int nTimes = GetDlgItemInt( hwnd, IDC_NUMBER, &bSuccess, FALSE );
          if ( bSuccess )
@@ -27,7 +25,6 @@ BOOL CALLBACK DlgProc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
             // Then we get the string they entered
             // First we need to find out how long it is so that we can
             // allocate some memory
-
             int len = GetWindowTextLength( GetDlgItem( hwnd, IDC_TEXT ) );
             if ( len > 0 )
             {
@@ -41,7 +38,6 @@ BOOL CALLBACK DlgProc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
 
                // Now we add the string to the list box however many times
                // the user asked us to.
-
                for ( i = 0; i < nTimes; i++ )
                {
                   int index = SendDlgItemMessage( hwnd, IDC_LIST, LB_ADDSTRING, 0, ( LPARAM ) buf );
@@ -72,7 +68,6 @@ BOOL CALLBACK DlgProc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
       {
          // When the user clicks the Remove button, we first get the number
          // of selected items
-
          HWND hList = GetDlgItem( hwnd, IDC_LIST );
          int count = SendMessage( hList, LB_GETSELCOUNT, 0, 0 );
          if ( count != LB_ERR )
@@ -80,7 +75,6 @@ BOOL CALLBACK DlgProc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
             if ( count != 0 )
             {
                // And then allocate room to store the list of selected items.
-
                int i;
                int* buf = ( int* ) GlobalAlloc( GPTR, sizeof( int ) * count );
                SendMessage( hList, LB_GETSELITEMS, ( WPARAM ) count, ( LPARAM ) buf );
@@ -92,7 +86,6 @@ BOOL CALLBACK DlgProc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
                // We loop backwards, because if we removed items
                // from top to bottom, it would change the indexes of the other
                // items!!!
-
                for ( i = count - 1; i >= 0; i-- )
                {
                   SendMessage( hList, LB_DELETESTRING, ( WPARAM ) buf[i], 0 );
@@ -127,19 +120,16 @@ BOOL CALLBACK DlgProc( HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam )
             {
                // We only want to continue if one and only one item is
                // selected.
-
                if ( count == 1 )
                {
                   // Since we know ahead of time we're only getting one
                   // index, there's no need to allocate an array.
-
                   int index;
                   int err = SendMessage( hList, LB_GETSELITEMS, ( WPARAM ) 1, ( LPARAM ) &index );
                   if ( err != LB_ERR )
                   {
                      // Get the data we associated with the item above
                      // (the number of times it was added)
-
                      int data = SendMessage( hList, LB_GETITEMDATA, ( WPARAM ) index, 0 );
 
                      SetDlgItemInt( hwnd, IDC_SHOWCOUNT, data, FALSE );

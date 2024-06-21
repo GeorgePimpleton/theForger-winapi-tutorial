@@ -2,13 +2,26 @@
 
 #include "resource.h"
 
+BOOL CALLBACK DlgProc( HWND, UINT, WPARAM, LPARAM );
+
+int WINAPI wWinMain( _In_     HINSTANCE inst,
+                     _In_opt_ HINSTANCE prevInst,
+                     _In_     PWSTR     cmdLine,
+                     _In_     int       cmdShow )
+{
+   UNREFERENCED_PARAMETER( prevInst );
+   UNREFERENCED_PARAMETER( cmdLine );
+   UNREFERENCED_PARAMETER( cmdShow );
+
+   return ( int ) DialogBoxParamW( inst, MAKEINTRESOURCE( IDD_MAIN ), NULL, ( DLGPROC ) DlgProc, 0L );
+}
+
 BOOL CALLBACK DlgProc( HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
    switch ( msg )
    {
    case WM_INITDIALOG:
       // This is where we set up the dialog box, and initialise any default values
-
       SetDlgItemTextW( wnd, IDC_TEXT, L"This is a string" );
       SetDlgItemInt( wnd, IDC_NUMBER, 5, FALSE );
       break;
@@ -180,12 +193,4 @@ BOOL CALLBACK DlgProc( HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam )
       return FALSE;
    }
    return TRUE;
-}
-
-int WINAPI wWinMain( _In_     HINSTANCE inst,
-                     _In_opt_ HINSTANCE prevInst,
-                     _In_     PWSTR     cmdLine,
-                     _In_     int       cmdShow )
-{
-   return ( int ) DialogBoxParamW( inst, MAKEINTRESOURCE( IDD_MAIN ), NULL, ( DLGPROC ) DlgProc, 0L );
 }
