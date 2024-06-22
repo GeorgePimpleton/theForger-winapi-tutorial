@@ -19,6 +19,7 @@ x64/
 *.user
 *.vcxproj
 *.filter
+revised-code.rar
 
 # MacOS-specific
 .DS_Store
