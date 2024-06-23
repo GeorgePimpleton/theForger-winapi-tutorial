@@ -4,4 +4,4 @@
 // the MFC equivalent for windows.h
 #include <afxwin.h>
 
-int result = AfxMessageBox(L"Hello MFC!", MB_OK | MB_ICONASTERISK);
+int result = AfxMessageBox( L"Hello MFC!", MB_OK | MB_ICONASTERISK );
