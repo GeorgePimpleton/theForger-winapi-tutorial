@@ -37,3 +37,8 @@ The source files don't require using Visual Studio.  As long as you use a Window
 
 ### Post-script
 The code as written by theForger ***is*** compileable as written as long as the code isn't compiled using the Unicode/wide character set. If someone wanted to compile using the Multi-byte character set the code needs zero modification.  There will be at least two warnings compiling the unmodified code this way, there should be no errors.
+
+---
+
+### Update
+Real life decided to get nasty and intrude.  I also discovered there were some insidious bugs burrowed deep in my revised code.   Being a self-taught programming hobbyist I needed (and need) some time to investigate what is wrong.  I can't say when I will get back to reworking this code.
