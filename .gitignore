@@ -4,7 +4,7 @@ Release/
 x64/
 .vs/
 
-# Compile & misc files
+# Unwanted compile & misc files
 *.exe
 *.aps
 *.obj
@@ -16,10 +16,11 @@ x64/
 *.pdb
 *.pch
 *.sln
+*.slnx
 *.user
 *.vcxproj
 *.filter
 revised-code.rar
 
-# MacOS-specific
+# MacOS-specific to ignore
 .DS_Store
