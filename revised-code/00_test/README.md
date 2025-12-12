@@ -3,7 +3,7 @@
 [![Platform](https://img.shields.io/badge/Platform%20-Win32-blue.svg)](https://github.com/GeorgePimpleton/theForger-winapi-tutorial/)
 This example is not a numbered part of the lessons, it shows the simplest possible Win32/Desktop WinAPI app possible.  Similar to the beginner's "Hello World!" example for C/C++ code.  Also included.
 
-If someone wants to learn C++ there's a free online tutorial site available: Learn C++.  https://www.learncpp.com/
+If someone wants to learn C\++ there's a free online tutorial site available: Learn C++.  https://www.learncpp.com/
 
 ### The initial test application created with MFC
 I wondered if a simple app that displays just a message box was possible using MFC.  Well, it is.  test_MFC.cpp shows how.

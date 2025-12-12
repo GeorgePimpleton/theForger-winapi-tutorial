@@ -3,7 +3,7 @@
 [![Platform](https://img.shields.io/badge/Platform%20-Win32-blue.svg)](https://github.com/GeorgePimpleton/theForger-winapi-tutorial/)
 
 ### A simple window using MFC
-Creating a custom sized window using MFC is more complicated than using the WinAPI.  ~~The code would have to call the CWnd::PreCreateWindow() function and specify the size of the window.  Setting the location of the window when creating the window in the WinAPI doesn't look to be possible.  So....even more code needed for a simple "how to program" example.  ***\*ouch!\****~~
+Creating a custom sized window using MFC is more complicated than using the WinAPI.  ~~The code would have to call the CWnd::PreCreateWindow() function and specify the size of the window.  Setting the location of the window when creating the window in the WinAPI doesn't look to be possible.  So....even more code needed for a simple "how to program" example.  **\*ouch!\***~~
 
 Well, there are several ways to create a sized window with MFC, sadly they bloat up the code.  One approach, the one shown here doesn't use the PreCreateWindow() method, reveals how MFC encapsulates the underlying WinAPI.
 

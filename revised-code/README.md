@@ -12,4 +12,4 @@ For most of the examples there are two different updates to the code.
 Enjoy!
 
 ### Notes
-The first two examples have additional code samples using the Microsoft Foundation Classes (MFC).  To show the differences between writing code using the C-based Desktop WinAPI and the C++-based MFC framework.
+The first two examples have additional code samples using the Microsoft Foundation Classes (MFC), to show the differences between writing code using the C-based Desktop WinAPI and the C++-based MFC framework.
