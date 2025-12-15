@@ -1,7 +1,8 @@
 # theForger's Win32 API tutorial, revised and updated code
 [![Language](https://img.shields.io/badge/Language%20-C-blue.svg)](https://github.com/GeorgePimpleton/theForger-winapi-tutorial/)
 [![Platform](https://img.shields.io/badge/Platform%20-Win32-blue.svg)](https://github.com/GeorgePimpleton/theForger-winapi-tutorial/)
-This example is not a numbered part of the lessons, it shows the simplest possible Win32/Desktop WinAPI app possible.  Similar to the beginner's "Hello World!" example for C/C++ code.  Also included.
+
+This example is not a numbered part of the lessons, it shows the simplest possible Win32/Desktop WinAPI app possible.  Similar to the beginner's "Hello World!" example for C/C++ code.  An example is also included.
 
 If someone wants to learn C\++ there's a free online tutorial site available: Learn C++.  https://www.learncpp.com/
 
