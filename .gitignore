@@ -21,6 +21,3 @@ x64/
 *.vcxproj
 *.filter
 revised-code.rar
-
-# MacOS-specific to ignore
-.DS_Store

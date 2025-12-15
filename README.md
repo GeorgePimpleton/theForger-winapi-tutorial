@@ -19,7 +19,7 @@ Rewriting the code to work with modern Windows systems is the goal.  The goal of
 ### Notes
 I changed the directory structure to better reflect the tutorial's flow.
 
-I used Visual Studio 2022 Community edition to rework and modernize the code as made sense to me.  The changes aren't the only way to go.
+I am using Visual Studio 2022 & 2026 Community editions to rework and modernize the code as made sense to me.  The changes I make aren't the only way to go.
 
 For most of the examples there are two different sets of code.  The first is the bare minimum needed to modify the code to work using the TEXT macro and character data type of TCHAR.  This approach allows flexibility when compiling Unicode or ANSI (wide character set).
 
@@ -41,4 +41,6 @@ The code as written by theForger ***is*** compileable as written as long as the 
 ---
 
 ### Update
-Real life decided to get nasty and intrude.  I also discovered there were some insidious bugs burrowed deep in my revised code.   Being a self-taught programming hobbyist I needed (and need) some time to investigate what is wrong.  I can't say when I will get back to reworking this code.
+~~Real life decided to get nasty and intrude.  I also discovered there were some insidious bugs burrowed deep in my revised code.   Being a self-taught programming hobbyist I needed (and need) some time to investigate what is wrong.  I can't say when I will get back to reworking this code.~~
+
+I can now say I have the time and desire to do the code updates.
