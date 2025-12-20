@@ -36,11 +36,6 @@ Why don't I simply repo the entire solution instead of just the individual sourc
 The source files don't require using Visual Studio.  As long as you use a Windows compliant compiler the sources should build runnable executables.
 
 ### Post-script
-The code as written by theForger ***is*** compileable as written as long as the code isn't compiled using the Unicode/wide character set. If someone wanted to compile using the Multi-byte character set the code needs zero modification.  There will be at least two warnings compiling the unmodified code this way, there should be no errors.
+The code as written by theForger ***is*** compileable as written as long as the code isn't compiled using the Unicode/wide character set. With a modern compiler If someone compiled the code using the Multi-byte character set the code needs zero modification.
 
----
-
-### Update
-~~Real life decided to get nasty and intrude.  I also discovered there were some insidious bugs burrowed deep in my revised code.   Being a self-taught programming hobbyist I needed (and need) some time to investigate what is wrong.  I can't say when I will get back to reworking this code.~~
-
-I can now say I have the time and desire to do the code updates.
+Using a modern compiler such as 2022 or 2026 (really recommended for Desktop WinAPI code), compiling using the Multi-byte character set both x64 and x86 are doable.  There will be at least two warnings compiling the unmodified code this way, there should be no errors.
