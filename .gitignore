@@ -1,23 +1,60 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+
+# Temporary files
+*.tmp
+
 # Unwanted folders
 Debug/
 Release/
 x64/
-.vs/
 
-# Unwanted compile & misc files
-*.exe
-*.aps
-*.obj
-*.lib
-*.log
-*.tlog
-*.VC.db
-*.cache
-*.pdb
-*.pch
+# Programming Windows files
+*.sdf
+*.opensdf
+*.vcxproj.user
 *.sln
 *.slnx
-*.user
-*.vcxproj
 *.filter
+
+# Misc folders
+cmake-build-debug/
+cmake-build-release/
+out/build/
+out/install/
+.vs/
+.idea/
+
+# Misc files
+CMakeSettings.json
 revised-code.rar
