@@ -9,4 +9,4 @@ An archive of [theForger's Win32 API Programming Tutorial](http://www.winprog.or
 A temporary internet glitch, the tutorial is back,  but still shows what might happen in the future.
 
 ### Notes
-I archived the site using WinHTTrack. https://www.httrack.com/
+I archived the site using [WinHTTrack](http://www.httrack.com/).

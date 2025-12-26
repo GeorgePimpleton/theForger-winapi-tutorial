@@ -13,3 +13,5 @@ Enjoy!
 
 ### Notes
 The first two examples have additional code samples using the Microsoft Foundation Classes (MFC), to show the differences between writing code using the C-based Desktop WinAPI and the C++-based MFC framework.
+
+MFC makes simple examples a lot more complicated.

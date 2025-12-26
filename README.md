@@ -9,6 +9,9 @@ Win9X/Me is officially dead!  Windows API ANSI encoding is dead!  Windows XP and
 
 Windows and C/C++ have changed since Win9X/Me was Windows.  Programmers need to adapt.
 
+No representation is made that the source code belongs to me, it's simply reproduced here in case the tutorial site disappears from the internet and remains the copyright of theForger.
+
+
 ### Why this repository exists
 theForger's Win32 API tutorial is one of the better non-MS affiliated free online resources for learning the basics of Win32 API programming, but the code is IMO hopelessly out-dated.  Written when Win9X was the main OS the Windows API has changed since then.  Windows is no longer a hybrid 16/32 bit hybrid operating system.  The core of the operating system is all 32-bit or 64-bit.  64-bit CPUs are now common and Microsoft has kept up by releasing x64 Windows with a resulting change to the Windows API.
 
@@ -36,6 +39,11 @@ Why don't I simply repo the entire solution instead of just the individual sourc
 The source files don't require using Visual Studio.  As long as you use a Windows compliant compiler the sources should build runnable executables.
 
 ### Post-script
-The code as written by theForger ***is*** compileable as written as long as the code isn't compiled using the Unicode/wide character set. With a modern compiler If someone compiled the code using the Multi-byte character set the code needs zero modification.
+The code as written by theForger ***is*** compileable as written.
 
-Using a modern compiler such as 2022 or 2026 (really recommended for Desktop WinAPI code), compiling using the Multi-byte character set both x64 and x86 are doable.  There will be at least two warnings compiling the unmodified code this way, there should be no errors.
+Using a modern compiler such as 2022 or 2026 (really recommended for Desktop WinAPI code), the Community editions.  The Community editions are free for non-commercial use.
+
+[Download Visual Studio 2026 Community](https://visualstudio.microsoft.com/downloads/)
+
+
+

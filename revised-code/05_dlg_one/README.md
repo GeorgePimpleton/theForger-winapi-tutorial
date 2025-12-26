@@ -3,4 +3,6 @@
 [![Platform](https://img.shields.io/badge/Platform%20-Win32-blue.svg)](https://github.com/GeorgePimpleton/theForger-winapi-tutorial/)
 
 ### Notes
-I chose to use the Visual Studio created .rc and resource.h files for both examples so I don't need to use the two directories setup.  I will do this with the later examples.
+I chose to use the Visual Studio created .rc and resource.h files for this and later examples so I don't need to use the two directories setup.
+
+Yeah, I'm a lazy bugger.
